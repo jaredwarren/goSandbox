@@ -1,0 +1,11 @@
+<page> 
+    <title>Apollo 11</title> 
+     <redirect title="Foo bar" /> 
+    <revision> 
+      <text xml:space="preserve"> 
+      {{Infobox Space mission 
+      |mission_name=&lt;!--See above--&gt; 
+      |insignia=Apollo_11_insignia.png 
+      </text> 
+    </revision> 
+</page>
