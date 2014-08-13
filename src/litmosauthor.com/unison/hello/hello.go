@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"litmosauthor.com/unison/string"
+)
 
 func main() {
-    fmt.Printf("hello, worlds\n")
+    fmt.Printf(string.Reverse("hello, worlds\n"))
 }
