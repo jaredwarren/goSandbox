@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
@@ -67,6 +67,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request, title string) {
 
 var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
 func executeTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+	fmt.Printf("Template:"+tmpl)
 	err := templates.ExecuteTemplate(w, tmpl+".html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -93,6 +94,7 @@ func main() {
 	}
 
 	http.ListenAndServe(":8080", nil)
+	fmt.Printf("Started...\n")
 
 	//r := router
 	//r.Handle("/", makeHandler(homeHandler))

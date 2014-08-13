@@ -1,61 +1,76 @@
-{{define "body"}}
-  <p>Gorilla is a web toolkit for the <a href="http://golang.org/">Go programming language</a>. Currently these packages are available:</p>
-  <ul>
-    <li><a href="/pkg/context">gorilla/context</a> stores global request variables.</li>
-    <li><a href="/pkg/mux">gorilla/mux</a> is a powerful URL router and dispatcher.</li>
-    <li><a href="/pkg/reverse">gorilla/reverse</a> produces reversible regular expressions for regexp-based muxes.</li>
-    <li><a href="/pkg/rpc">gorilla/rpc</a> implements RPC over HTTP with codec for <a href="/pkg/rpc/json">JSON-RPC</a>.</li>
-    <li><a href="/pkg/schema">gorilla/schema</a> converts form values to a struct.</li>
-    <li><a href="/pkg/securecookie">gorilla/securecookie</a> encodes and decodes authenticated and optionally encrypted cookie values.</li>
-    <li><a href="/pkg/sessions">gorilla/sessions</a> saves cookie and filesystem sessions and allows custom session backends.</li>
-  </ul>
+<html>
+<head>
+<title>Not Found (404)</title>
+<style id="antiClickjack">body{display:none !important;}</style>
+<script type="text/javascript">
+   if (self === top) {
+       var antiClickjack = document.getElementById("antiClickjack");
+       antiClickjack.parentNode.removeChild(antiClickjack);
+   } else {
+       top.location = self.location;
+   }
+</script>
+<style type="text/css">
+<!--
+body {
+  margin: 0px 20px 0px 20px;
+  background-color: #f2f0f5;
+  font-family: Verdana, Arial, Sans-Serif;
+}
+.box-center {
+  text-align: center;
+  margin-top: 50px;
+}
+.box {
+  width: 500px;
+  margin: 0px auto -1px auto;
+  border: 4px solid #336699;
+  padding: 0px 20px 20px 20px;
+  background-color: #fff;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+}
+.box-content {
+  padding: 5px;
+  font-family: Arial;
+  color: #666;
+}
+.box-body {
+  margin-top: 10px;
+}
+.error-man {
+  float: left;
+  padding-right: 10px;
+}
+h2 {
+  font-size: 1.2em;
+  color: #455E74;
+}
+.options{
+  text-align: left;
+}
 
-  <h2>Installation</h2>
-  <p>Run "go get" pointing to a package. For example, to install gorilla/mux:</p>
-  <pre>$ go get github.com/gorilla/mux</pre>
-  <p>Or clone a <a href="https://github.com/gorilla/">repository</a> and use the source code directly:</p>
-  <pre>$ git clone git://github.com/gorilla/mux.git</pre>
+-->
+</style>
+</head>
+<body>
+    <div>
+        <div class="box-center">
+            <div class="box">
+                <div class="box-content">
+                    <div class="box-body">
+                        <img alt="error" class="error-man" src="https://static1.litmos.com/static/images/errorman.png?v=20111011">                        
+                        <h2>It seems this page is NOT missing.</h2>
+                        <div>Please look for misspellings in the address</div>
+                        <div><p>or just:</p><ul class="options"><li>Go back to the <a href="javascript:window.history.back()">previous page</a></li><li>Go to the <a href="/project/dashboard/">Home Page</a></li></ul></div>
+                    </div>
+                    <div class="clear">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <p>For Google App Engine, create a directory tree inside your app and clone the repository there:</p>
-  <pre>$ cd myapp
-$ mkdir -p github.com/gorilla
-$ cd github.com/gorilla
-$ git clone git://github.com/gorilla/mux.git</pre>
 
-  <h2>FAQ</h2>
-  <p>
-    <strong>Q:</strong> Is Gorilla a framework?<br>
-    <strong>A:</strong> No, it is a toolkit. Just use what you need with your favorite framework or the http package.
-  </p>
-  <p>
-    <strong>Q:</strong> Why the name Gorilla?<br>
-    <strong>A:</strong> Because it starts with "Go". Also, we want to raise awareness about endangered primates.
-  </p>
-  <p>
-    <strong>Q:</strong> Can I buy a fluffy toy of that tiny cute gorilla from your logo?<br>
-    <strong>A:</strong> Not yet.
-  </p>
-
-  <h2>Testimonials</h2>
-  <p>
-    <em>"Gorilla is fresh and tidy. It's like wearing recently washed underpants."</em> -- Geekoid, on Hacker News
-  </p>
-  <p>
-    <em>"I wish Gorilla was written in Haskell."</em> -- Rasmus Jørgensen, Haskell developer
-  </p>
-  <p>
-    <em>"Come on... what's next? Goldfish? Goat? Goose?!?"</em> -- AnonymousCoward, on Reddit
-  </p>
-
-  <h2>Discussion</h2>
-  <p>Join the <a href="http://groups.google.com/group/gorilla-web">gorilla-web mailing list</a>.</p>
-
-  <h2>License</h2>
-  <p>Gorilla is licensed under the <a href="https://github.com/gorilla/mux/blob/master/LICENSE">New BSD License</a>.</p>
-{{end}}
-
-{{define "title"}}Gorilla, the golang web toolkit{{end}}
-
-{{define "extrahead"}}{{end}}
-
-{{define "extrabody"}}{{end}}
+</body>
