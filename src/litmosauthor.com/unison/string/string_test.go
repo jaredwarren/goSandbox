@@ -7,6 +7,7 @@ func Test(t *testing.T) {
 		s, want string
 	}{
 		{"asdf", "fdsa"},
+		{"ʬʧ", "ʧʬ"},
 		{"", ""},
 	}
 	for _, c := range tests {
