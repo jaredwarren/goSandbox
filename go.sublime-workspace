@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"bod",
+				"Body"
+			],
+			[
+				"Page",
+				"Page"
+			],
+			[
+				"io",
+				"ioutil"
+			],
+			[
 				"title",
 				"Title"
 			],
@@ -480,30 +492,51 @@
 	"buffers":
 	[
 		{
-			"file": "hello.go",
+			"file": "src/litmosauthor.com/unison/hello/hello.go",
 			"settings":
 			{
-				"buffer_size": 76,
-				"line_ending": "Windows",
-				"name": "package main"
+				"buffer_size": 132,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "xml.go",
+			"file": "src/litmosauthor.com/unison/app.go",
 			"settings":
 			{
-				"buffer_size": 2032,
-				"line_ending": "Unix",
-				"name": "package main"
+				"buffer_size": 2681,
+				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "xmlexample.go",
+			"file": "src/litmosauthor.com/unison/string/string_test.go",
 			"settings":
 			{
-				"buffer_size": 1121,
-				"line_ending": "Windows",
-				"name": "package main"
+				"buffer_size": 295,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "gowiki/wiki.go",
+			"settings":
+			{
+				"buffer_size": 800,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "gowiki/server.go",
+			"settings":
+			{
+				"buffer_size": 240,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/litmosauthor.com/unison/string/string.go",
+			"settings":
+			{
+				"buffer_size": 163,
+				"line_ending": "Windows"
 			}
 		},
 		{
@@ -512,6 +545,22 @@
 			{
 				"buffer_size": 40560,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/litmosauthor.com/unison/static/templates/404.html",
+			"settings":
+			{
+				"buffer_size": 1865,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/litmosauthor.com/unison/static/templates/home.html",
+			"settings":
+			{
+				"buffer_size": 1891,
+				"line_ending": "Windows"
 			}
 		},
 		{
@@ -611,6 +660,9 @@
 	},
 	"file_history":
 	[
+		"/C/data/www/go/xmlexample.go",
+		"/C/data/www/go/xml.go",
+		"/C/data/www/go/hello.go",
 		"/C/data/www/mobile/sco.xml",
 		"/C/data/www/mlss2/SCORM_db_client.js",
 		"/C/data/www/mlss2/app/controller/AppController.js",
@@ -735,10 +787,7 @@
 		"/C/Users/jaredwarren/Desktop/SCSS/ri/default/_quiz.scss",
 		"/C/data/www/mobile/resources/sass/ri/default/_lowertoolbar.scss",
 		"/C/data/www/mobile/app/view/PageInfo.js",
-		"/C/data/www/mobile/app/view/phone/UpperToolBar.js",
-		"/C/data/www/mobile/app/view/tablet/UpperToolBar.js",
-		"/C/data/www/mobile/app/view/phone/LowerToolBar.js",
-		"/C/data/www/mobile/app/view/tablet/LowerToolBar.js"
+		"/C/data/www/mobile/app/view/phone/UpperToolBar.js"
 	],
 	"find":
 	{
@@ -780,6 +829,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"templates",
+			";",
 			"// ",
 			"Page",
 			"Topics",
@@ -905,8 +956,6 @@
 			"questiontext",
 			"questionText",
 			"questiontext",
-			"questionText",
-			"questonText",
 			"questionText"
 		],
 		"highlight": true,
@@ -915,6 +964,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			";\n",
 			"",
 			"page",
 			"topics",
@@ -975,98 +1025,183 @@
 			[
 				{
 					"buffer": 0,
-					"file": "hello.go",
+					"file": "src/litmosauthor.com/unison/hello/hello.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 76,
+						"buffer_size": 132,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								76,
-								0
+								130,
+								85
 							]
 						],
 						"settings":
 						{
-							"auto_name": "package main",
 							"syntax": "Packages/Go/Go.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "xml.go",
+					"file": "src/litmosauthor.com/unison/app.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2032,
+						"buffer_size": 2681,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1419,
-								1419
+								1717,
+								1717
 							]
 						],
 						"settings":
 						{
-							"auto_name": "package main",
 							"syntax": "Packages/Go/Go.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 156.0,
+						"translation.y": 468.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 2,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 1,
-			"sheets":
-			[
+				},
 				{
 					"buffer": 2,
-					"file": "xmlexample.go",
+					"file": "src/litmosauthor.com/unison/string/string_test.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1121,
+						"buffer_size": 295,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								603,
-								603
+								295,
+								295
 							]
 						],
 						"settings":
 						{
-							"auto_name": "package main",
-							"syntax": "Packages/Go/Go.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Go/Go.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
+					"file": "gowiki/wiki.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 800,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								56,
+								56
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "gowiki/server.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 240,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								238,
+								174
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/Go/Go.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/litmosauthor.com/unison/string/string.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 163,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								60,
+								60
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/Go/Go.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 6,
 					"file": "sco.xml",
 					"semi_transient": false,
 					"settings":
@@ -1078,8 +1213,8 @@
 						"selection":
 						[
 							[
-								2651,
-								2651
+								3189,
+								3189
 							]
 						],
 						"settings":
@@ -1092,10 +1227,69 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 7,
+					"file": "src/litmosauthor.com/unison/static/templates/404.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1865,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								1865
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/litmosauthor.com/unison/static/templates/home.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1891,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								636,
+								636
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 120.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
 					"file": "page.xml",
 					"semi_transient": false,
 					"settings":
@@ -1120,10 +1314,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 10,
 					"semi_transient": false,
 					"settings":
 					{
@@ -1148,6 +1343,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1191,10 +1387,14 @@
 		]
 	},
 	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
 	"project": "go.sublime-project",
 	"replace":
 	{
-		"height": 62.0
+		"height": 78.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1735,6 +1935,10 @@
 	},
 	"settings":
 	{
+		"xdebug":
+		{
+			"hide_conflict": false
+		}
 	},
 	"show_minimap": true,
 	"show_open_files": false,

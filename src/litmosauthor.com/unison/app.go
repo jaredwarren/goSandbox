@@ -7,36 +7,18 @@ import (
 	"net/http"
 	"regexp"
 	"flag"
-	"net"
+	//"net"
 	"log"
-	"io/ioutil"
+	//"io/ioutil"
+
+	"litmosauthor.com/unison/controller/project"
+
+	"database/sql"
+ 	_ "github.com/go-sql-driver/mysql"
 )
 var (
 	addr = flag.Bool("addr", false, "find open address and print to final-port.txt")
 )
-
-// handlerFunc adapts a function to an http.Handler.
-// type handlerFunc func(http.ResponseWriter, *http.Request) error
-
-// func (f handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-// 	if r.Host != "www.gorillatoolkit.org" && !appengine.IsDevAppServer() {
-// 		r.URL.Host = "www.gorillatoolkit.org"
-// 		http.Redirect(w, r, r.URL.String(), 301)
-// 		return
-// 	}
-
-// 	err := f(w, r)
-// 	if err != nil {
-// 		appengine.NewContext(r).Errorf("Error %s", err.Error())
-// 		if e, ok := err.(doc.GetError); ok {
-// 			http.Error(w, "Error getting files from "+e.Host+".", http.StatusInternalServerError)
-// 		} else if appengine.IsCapabilityDisabled(err) || appengine.IsOverQuota(err) {
-// 			http.Error(w, "Internal error: "+err.Error(), http.StatusInternalServerError)
-// 		} else {
-// 			http.Error(w, "Internal Error", http.StatusInternalServerError)
-// 		}
-// 	}
-// }
 
 type Page struct {
 	Title string
@@ -45,24 +27,57 @@ type Page struct {
 
 var validPath = regexp.MustCompile("^/(edit|save|view|home)/([a-zA-Z0-9]+)$")
 
-func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+func makeHandler(fn func(http.ResponseWriter, *http.Request, *sql.DB)) http.HandlerFunc {
+	// do some checking, e.g. db - alpha or beta
 	return func(w http.ResponseWriter, r *http.Request) {
-		m := validPath.FindStringSubmatch(r.URL.Path)
-		if m == nil {
-			http.NotFound(w, r)
-			return
-		}
-		fn(w, r, m[2])
+		fn(w, r, alphaDB)
 	}
 }
 
-func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+/*
+func notFoundHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	executeTemplate(w, "404", nil)
+	db, _ := sql.Open("mysql", "user:password@/dbname")
+	age := 27
+    rows, err := db.Query("SELECT name FROM users WHERE age=?", age)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer rows.Close()
+    for rows.Next() {
+        var name string
+        if err := rows.Scan(&name); err != nil {
+                log.Fatal(err)
+        }
+        fmt.Printf("%s is %d\n", name, age)
+    }
+    if err := rows.Err(); err != nil {
+        log.Fatal(err)
+    }
 }
+*/
 
-func homeHandler(w http.ResponseWriter, r *http.Request, title string) {
+func homeHandler(res http.ResponseWriter, req *http.Request, db *sql.DB) {
+	fmt.Println("home")
+	cust_id := "unison"
+    rows, err := db.Query("SELECT project_name FROM project WHERE cust_id=?", cust_id)
+    if err != nil {
+        log.Fatal(err) 
+    }
+    defer rows.Close()
+    for rows.Next() {
+        var name string
+        if err := rows.Scan(&name); err != nil {
+            log.Fatal(err)
+        }
+        fmt.Printf("--%s--\n", name)
+    }
+    if err := rows.Err(); err != nil {
+        log.Fatal(err)
+    }
+
 	p := &Page{Title: "title", Body: []byte("body")}
-	executeTemplate(w, "home", p)
+	executeTemplate(res, "home", p)
 }
 
 var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
@@ -74,31 +89,30 @@ func executeTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	}
 }
 
+
+// http://www.gorillatoolkit.org/pkg/mux
 var router = mux.NewRouter()
 
+var alphaDB *sql.DB
+
+//var store = sessions.NewCookieStore([]byte("something-very-secret"))
+
 func main() {
-	flag.Parse()
-	http.HandleFunc("/view/", makeHandler(homeHandler))
-	if *addr {
-		l, err := net.Listen("tcp", "127.0.0.1:0")
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = ioutil.WriteFile("final-port.txt", []byte(l.Addr().String()), 0644)
-		if err != nil {
-			log.Fatal(err)
-		}
-		s := &http.Server{}
-		s.Serve(l)
-		return
-	}
+	r := router
 
-	http.ListenAndServe(":8080", nil)
-	fmt.Printf("Started...\n")
+	// setup DB
+	var err error
+	alphaDB, err = sql.Open("mysql", "webuser:(^#F$nt45T!c.?-)@/alpha")
+	if err != nil {
+        log.Fatal(err)
+    }
 
-	//r := router
-	//r.Handle("/", makeHandler(homeHandler))
-	//http.Handle("/", r)
-	//r.Handle("/dashboard" handlerFunc(dashboardHandler))
+    // Routs
+	r.HandleFunc("/", makeHandler(project.Dashboard))
 
+
+	// wait for clients  
+	http.Handle("/", r)
+	http.ListenAndServe(":8083", nil) 
+	//http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }
