@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"fu",
+				"func (*Complex)	func (...) {...} ʂ"
+			],
+			[
+				"fun",
+				"func (*hub)	func (...) {...} ʂ"
+			],
+			[
+				"han",
+				"HandleFunc	 ƒ"
+			],
+			[
+				"Pa",
+				"Path	string ν"
+			],
+			[
+				"Re",
+				"Request	struct ʈ"
+			],
+			[
+				"Res",
+				"ResponseWriter	interface ¡"
+			],
+			[
+				"P",
+				"Printf"
+			],
+			[
+				"imp",
+				"import"
+			],
+			[
 				"bod",
 				"Body"
 			],
@@ -408,10 +440,6 @@
 				"numberOfSlices"
 			],
 			[
-				"fun",
-				"function"
-			],
-			[
 				"backgroun",
 				"background-color"
 			],
@@ -492,91 +520,45 @@
 	"buffers":
 	[
 		{
-			"file": "src/litmosauthor.com/unison/hello/hello.go",
+			"file": "src/sandbox/ws/main.go",
 			"settings":
 			{
-				"buffer_size": 132,
+				"buffer_size": 878,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/litmosauthor.com/unison/app.go",
+			"file": "src/sandbox/stringer.go",
 			"settings":
 			{
-				"buffer_size": 2681,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/litmosauthor.com/unison/string/string_test.go",
-			"settings":
-			{
-				"buffer_size": 295,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "gowiki/wiki.go",
-			"settings":
-			{
-				"buffer_size": 800,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "gowiki/server.go",
-			"settings":
-			{
-				"buffer_size": 240,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/litmosauthor.com/unison/string/string.go",
-			"settings":
-			{
-				"buffer_size": 163,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "sco.xml",
-			"settings":
-			{
-				"buffer_size": 40560,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/litmosauthor.com/unison/static/templates/404.html",
-			"settings":
-			{
-				"buffer_size": 1865,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/litmosauthor.com/unison/static/templates/home.html",
-			"settings":
-			{
-				"buffer_size": 1891,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "page.xml",
-			"settings":
-			{
-				"buffer_size": 278,
+				"buffer_size": 279,
 				"line_ending": "Windows",
-				"name": "<page>"
+				"name": "package main"
 			}
 		},
 		{
-			"contents": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\" xml:lang=\"en-us\" updated=\"2009-10-04T01:35:58+00:00\">\n    <title>Code Review - My issues</title>\n    <link href=\"http://codereview.appspot.com/\" rel=\"alternate\" />\n    <link href=\"http://codereview.appspot.com/rss/mine/rsc\" rel=\"self\" />\n    <id>http://codereview.appspot.com/</id>\n    <author>\n        <name>rietveld&lt;&gt;</name>\n    </author>\n    <entry>\n        <title>rietveld: an attempt at pubsubhubbub</title>\n        <link href=\"http://codereview.appspot.com/126085\" rel=\"alternate\" />\n        <updated>2009-10-04T01:35:58+00:00</updated>\n        <author>\n            <name>email-address-removed</name>\n        </author>\n        <id>urn:md5:134d9179c41f806be79b3a5f7877d19a</id>\n        <summary type=\"html\">An attempt at adding pubsubhubbub support to Rietveld.\n    http://code.google.com/p/pubsubhubbub\n    http://code.google.com/p/rietveld/issues/detail?id=155\n    \n    The server side of the protocol is trivial:\n      1. add a &amp;lt;link rel=&amp;quot;hub&amp;quot; href=&amp;quot;hub-server&amp;quot;&amp;gt; tag to all\n         feeds that will be pubsubhubbubbed.\n      2. every time one of those feeds changes, tell the hub\n         with a simple POST request.\n    \n    I have tested this by adding debug prints to a local hub\n    server and checking that the server got the right publish\n    requests.\n    \n    I can&amp;#39;t quite get the server to work, but I think the bug\n    is not in my code.  I think that the server expects to be\n    able to grab the feed and see the feed&amp;#39;s actual URL in\n    the link rel=&amp;quot;self&amp;quot;, but the default value for that drops\n    the :port from the URL, and I cannot for the life of me\n    figure out how to get the Atom generator deep inside\n    django not to do that, or even where it is doing that,\n    or even what code is running to generate the Atom feed.\n    (I thought I knew but I added some assert False statements\n    and it kept running!)\n    \n    Ignoring that particular problem, I would appreciate\n    feedback on the right way to get the two values at\n    the top of feeds.py marked NOTE(rsc).</summary>\n    </entry>\n    <entry>\n        <title>rietveld: correct tab handling</title>\n        <link href=\"http://codereview.appspot.com/124106\" rel=\"alternate\" />\n        <updated>2009-10-03T23:02:17+00:00</updated>\n        <author>\n            <name>email-address-removed</name>\n        </author>\n        <id>urn:md5:0a2a4f19bb815101f0ba2904aed7c35a</id>\n        <summary type=\"html\">This fixes the buggy tab rendering that can be seen at\n    http://codereview.appspot.com/116075/diff/1/2\n    \n    The fundamental problem was that the tab code was\n    not being told what column the text began in, so it\n    didn&amp;#39;t know where to put the tab stops.  Another problem\n    was that some of the code assumed that string byte\n    offsets were the same as column offsets, which is only\n    true if there are no tabs.\n    \n    In the process of fixing this, I cleaned up the arguments\n    to Fold and ExpandTabs and renamed them Break and\n    _ExpandTabs so that I could be sure that I found all the\n    call sites.  I also wanted to verify that ExpandTabs was\n    not being used from outside intra_region_diff.py.</summary>\n    </entry>\n</feed>",
+			"file": "src/sandbox/ws/hub.go",
 			"settings":
 			{
-				"buffer_size": 3321,
+				"buffer_size": 1181,
+				"line_ending": "Windows",
+				"name": "package main"
+			}
+		},
+		{
+			"file": "src/sandbox/ws/conn.go",
+			"settings":
+			{
+				"buffer_size": 2634,
+				"line_ending": "Windows",
+				"name": "// Copyright 2013 The Gorilla WebSocket Authors. A"
+			}
+		},
+		{
+			"file": "src/sandbox/ws/home.html",
+			"settings":
+			{
+				"buffer_size": 1862,
 				"line_ending": "Windows"
 			}
 		}
@@ -584,9 +566,25 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 58.0,
+		"height": 127.0,
 		"selected_items":
 		[
+			[
+				"fmt",
+				"GoSublime: Fmt and save"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"go",
+				"Set Syntax: Go"
+			],
 			[
 				"json",
 				"Set Syntax: JSON"
@@ -598,14 +596,6 @@
 			[
 				"JSON",
 				"Set Syntax: JSON"
-			],
-			[
-				"java",
-				"Set Syntax: JavaScript"
-			],
-			[
-				"inst",
-				"Package Control: Install Package"
 			],
 			[
 				"install",
@@ -658,8 +648,32 @@
 		"side_bar_visible": false,
 		"status_bar_visible": false
 	},
+	"expanded_folders":
+	[
+		"/C/data/www/sandbox/webgl/aquarium"
+	],
 	"file_history":
 	[
+		"/C/data/www/go/sco.xml",
+		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/404.html",
+		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/home.html",
+		"/C/data/www/go/page.xml",
+		"/C/data/www/go/src/litmosauthor.com/unison/hello/hello.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/app.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/controller/project.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/controller/controller.go",
+		"/C/data/www/go/src/github.com/go-sql-driver/mysql/driver.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/string/string_test.go",
+		"/C/data/www/go/gowiki/wiki.go",
+		"/C/data/www/go/gowiki/server.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/string/string.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/controller/project/project.go",
+		"/C/Users/jaredwarren/AppData/Local/Temp/Temp1_liteidex23.2.windows.zip/liteide/LGPL_EXCEPTION.TXT",
+		"/C/Users/jaredwarren/AppData/Local/Temp/Temp1_liteidex23.2.windows.zip/liteide/README.md",
+		"/C/Users/jaredwarren/AppData/Roaming/Sublime Text 3/Packages/GoSublime/CHANGELOG.md",
+		"/C/Users/jaredwarren/Downloads/Button Click.xml",
+		"/C/data/www/go/src/github.com/gorilla/sessions/store.go",
+		"/C/data/www/go/src/litmosauthor.com/unison/controller/project.og",
 		"/C/data/www/go/xmlexample.go",
 		"/C/data/www/go/xml.go",
 		"/C/data/www/go/hello.go",
@@ -767,27 +781,7 @@
 		"/C/data/www/mobile/.gitignore",
 		"/C/data/CourseFiles/.gitignore",
 		"/C/data/www/mobile/resources/sass/ri/default/_textimage.scss",
-		"/C/data/www/mobile/resources/sass/ri/default/_note.scss",
-		"/C/data/www/mobile/quiz.xml",
-		"/C/data/www/mobile/app/view/AudioBar.js",
-		"/C/data/www/mobile/app/page/components/ImagePopup_Mixin.js",
-		"/C/data/www/mobile/app/page/components/TextImage.js",
-		"/C/data/www/mobile/app/page/components/ImagePopup.js",
-		"/C/data/www/mobile/resources/sass/ri/default/_casestudy.scss",
-		"/C/data/www/mobile/app/page/components/AudioBox.js",
-		"/C/data/www/mobile/app/page/StepbyStep.js",
-		"/C/data/www/mobile/indexPhone.html",
-		"/C/data/www/mobile/resources/sass/ri/default/_gameconcentration.scss",
-		"/C/data/www/mobile/resources/sass/ri/default/_spinthewheel.scss",
-		"/C/data/www/mobile/app/page/Matching.js",
-		"/C/data/www/mobile/app/page/PopupExternalActivity.js",
-		"/C/data/www/mobile/app/page/TextandAudio.js",
-		"/C/data/www/mobile/data/sco.json",
-		"/C/Users/jaredwarren/Desktop/SCSS/app.scss",
-		"/C/Users/jaredwarren/Desktop/SCSS/ri/default/_quiz.scss",
-		"/C/data/www/mobile/resources/sass/ri/default/_lowertoolbar.scss",
-		"/C/data/www/mobile/app/view/PageInfo.js",
-		"/C/data/www/mobile/app/view/phone/UpperToolBar.js"
+		"/C/data/www/mobile/resources/sass/ri/default/_note.scss"
 	],
 	"find":
 	{
@@ -798,6 +792,8 @@
 		"height": 90.0,
 		"where_history":
 		[
+			"C:\\data\\www\\go,*.go",
+			"C:\\data\\www\\go",
 			"C:\\data\\www\\mlss2\\app,*.js",
 			"C:\\data\\www\\mobile\\app,*.js",
 			"C:\\data\\www\\mobile\\app,*.scss",
@@ -829,6 +825,19 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"readPump",
+			"pingPeriod",
+			"upgrader",
+			"readPump",
+			"QueryRow",
+			" QueryRow",
+			"Open",
+			" Open(",
+			"interface",
+			"interface {",
+			"store",
+			"makeHandler",
+			"notFoundHandler",
 			"templates",
 			";",
 			"// ",
@@ -943,20 +952,7 @@
 			"questionText",
 			"questiontext",
 			"questionText",
-			"questiontext",
-			"questionText",
-			"questiontext",
-			"questionText",
-			"questiontext",
-			"questionText",
-			"questiontext",
-			"questionText",
-			"questiontext",
-			"questionText",
-			"questiontext",
-			"questionText",
-			"questiontext",
-			"questionText"
+			"questiontext"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1025,203 +1021,25 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/litmosauthor.com/unison/hello/hello.go",
+					"file": "src/sandbox/ws/main.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 132,
+						"buffer_size": 878,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								130,
-								85
+								639,
+								639
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Go/Go.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/litmosauthor.com/unison/app.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2681,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1717,
-								1717
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Go/Go.tmLanguage",
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
 							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 468.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/litmosauthor.com/unison/string/string_test.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 295,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								295,
-								295
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Go/Go.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "gowiki/wiki.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 800,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								56,
-								56
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Go/Go.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "gowiki/server.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 240,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								238,
-								174
-							]
-						],
-						"settings":
-						{
-							"auto_name": "",
-							"syntax": "Packages/Go/Go.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/litmosauthor.com/unison/string/string.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 163,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								60,
-								60
-							]
-						],
-						"settings":
-						{
-							"auto_name": "",
-							"syntax": "Packages/Go/Go.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 4,
-			"sheets":
-			[
-				{
-					"buffer": 6,
-					"file": "sco.xml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 40560,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3189,
-								3189
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/XML/XML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1231,119 +1049,129 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "src/litmosauthor.com/unison/static/templates/404.html",
+					"buffer": 1,
+					"file": "src/sandbox/stringer.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1865,
+						"buffer_size": 279,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								1865
+								73,
+								73
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "src/litmosauthor.com/unison/static/templates/home.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1891,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								636,
-								636
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 120.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "page.xml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 278,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								278,
-								278
-							]
-						],
-						"settings":
-						{
-							"auto_name": "<page>",
-							"syntax": "Packages/XML/XML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3321,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1327,
-								1327
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/XML/XML.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"auto_name": "package main",
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/sandbox/ws/hub.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1181,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								603,
+								603
+							]
+						],
+						"settings":
+						{
+							"auto_name": "package main",
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/sandbox/ws/conn.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2634,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1421,
+								1421
+							]
+						],
+						"settings":
+						{
+							"auto_name": "// Copyright 2013 The Gorilla WebSocket Authors. A",
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 4,
+					"file": "src/sandbox/ws/home.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1862,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								516,
+								516
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 52.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -1933,6 +1761,7 @@
 		],
 		"width": 488.0
 	},
+	"selected_group": 0,
 	"settings":
 	{
 		"xdebug":

@@ -1,21 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"html/template"
+	//"html/template"
 	"net/http"
 	"regexp"
-	"flag"
 	//"net"
 	"log"
 	//"io/ioutil"
 
-	"litmosauthor.com/unison/controller/project"
+	"litmosauthor.com/unison/project"
 
 	"database/sql"
- 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 )
+
 var (
 	addr = flag.Bool("addr", false, "find open address and print to final-port.txt")
 )
@@ -57,38 +58,38 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 */
 
-func homeHandler(res http.ResponseWriter, req *http.Request, db *sql.DB) {
+/*func homeHandler(res http.ResponseWriter, req *http.Request, db *sql.DB) {
 	fmt.Println("home")
 	cust_id := "unison"
-    rows, err := db.Query("SELECT project_name FROM project WHERE cust_id=?", cust_id)
-    if err != nil {
-        log.Fatal(err) 
-    }
-    defer rows.Close()
-    for rows.Next() {
-        var name string
-        if err := rows.Scan(&name); err != nil {
-            log.Fatal(err)
-        }
-        fmt.Printf("--%s--\n", name)
-    }
-    if err := rows.Err(); err != nil {
-        log.Fatal(err)
-    }
+	rows, err := db.Query("SELECT project_name FROM project WHERE cust_id=?", cust_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("--%s--\n", name)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
 
 	p := &Page{Title: "title", Body: []byte("body")}
 	executeTemplate(res, "home", p)
 }
 
 var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
+
 func executeTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	fmt.Printf("Template:"+tmpl)
+	fmt.Printf("Template:" + tmpl)
 	err := templates.ExecuteTemplate(w, tmpl+".html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
+}*/
 
 // http://www.gorillatoolkit.org/pkg/mux
 var router = mux.NewRouter()
@@ -104,15 +105,17 @@ func main() {
 	var err error
 	alphaDB, err = sql.Open("mysql", "webuser:(^#F$nt45T!c.?-)@/alpha")
 	if err != nil {
-        log.Fatal(err)
-    }
+		log.Fatal(err)
+	}
 
-    // Routs
-	r.HandleFunc("/", makeHandler(project.Dashboard))
+	// Routs
+	//r.HandleFunc("/", makeHandler(project.Dashboard))
+	http.Handle("/project/", project.MakeMuxer("/project/"))
+	//r.HandleFunc("/project/", project.makeHandler("/project/"))
 
-
-	// wait for clients  
+	fmt.Println("Started...")
+	// wait for clients
 	http.Handle("/", r)
-	http.ListenAndServe(":8083", nil) 
+	http.ListenAndServe(":8080", nil)
 	//http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }
