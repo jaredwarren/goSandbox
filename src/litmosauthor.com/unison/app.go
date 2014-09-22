@@ -102,6 +102,7 @@ func main() {
 	r := router
 
 	// setup DB
+	// TODO: select alpha or beta db based on cust id/subdomain
 	var err error
 	alphaDB, err = sql.Open("mysql", "webuser:(^#F$nt45T!c.?-)@/alpha")
 	if err != nil {
@@ -110,12 +111,12 @@ func main() {
 
 	// Routs
 	//r.HandleFunc("/", makeHandler(project.Dashboard))
-	http.Handle("/project/", project.MakeMuxer("/project/"))
+	http.Handle("/project/", project.MakeMuxer("/project/", alphaDB))
 	//r.HandleFunc("/project/", project.makeHandler("/project/"))
 
-	fmt.Println("Started...")
 	// wait for clients
 	http.Handle("/", r)
+	fmt.Println("Running...\n")
 	http.ListenAndServe(":8080", nil)
 	//http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }
