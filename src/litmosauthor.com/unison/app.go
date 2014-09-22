@@ -104,6 +104,7 @@ func main() {
 	// setup DB
 	// TODO: select alpha or beta db based on cust id/subdomain
 	var err error
+	// TODO:replace with real password.
 	alphaDB, err = sql.Open("mysql", "webuser:(^#F$nt45T!c.?-)@/alpha")
 	if err != nil {
 		log.Fatal(err)
