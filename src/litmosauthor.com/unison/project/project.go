@@ -28,13 +28,20 @@ type Comment struct {
 }
 
 type Page struct {
-	Tags    *Tags
-	Content *Content
-	Comment *Comment
+	Tags     *Tags
+	Content  *Content
+	Comment  *Comment
+	Projects Projects
+}
+
+type Projects []Project
+
+func (p Projects) HasProjects() bool {
+	return len(p) > 0
 }
 
 type Project struct {
-	Id     int    `db:"project_id"`
+	Id     string `db:"project_id"`
 	Name   string `db:"project_name"`
 	CustId string `db:"cust_id"`
 }
@@ -43,38 +50,35 @@ func NewProject() *Project {
 	return &Project{}
 }
 
-func Dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	fmt.Println("Project::Dashboard")
-	//cust_id := "unison"
+func getProjects(db *sql.DB) Projects {
+	projects := Projects{}
 
-	/*project := []Project{}
-
-	err := db.Select(&project, "SELECT project_name FROM project WHERE cust_id=?", cust_id)
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(project)
-	*/
-
-	/*rows, err := db.Query("SELECT project_name FROM project WHERE cust_id=?", cust_id)
+	cust_id := "unison"
+	rows, err := db.Query("SELECT project_id, project_name, cust_id FROM project WHERE cust_id=?", cust_id)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var name string
 		//var project Project
-		if err := rows.Scan(&name); err != nil {
+		project := Project{}
+		if err := rows.Scan(&project.Id, &project.Name, &project.CustId); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("~~%s~~\n", name)
+		projects = append(projects, project)
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
-	}*/
+	}
 
-	//executeTemplate(w, "home")
-	log.Println("...")
+	return projects
+}
+
+func Dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	fmt.Println("Project::Dashboard")
+
+	projects := getProjects(db)
+	//fmt.Println(projects.HasProjects())
 
 	// for now parse every request so I don't have to recompile, maybe
 	tmpl := make(map[string]*template.Template)
@@ -82,8 +86,9 @@ func Dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	tmpl["other.html"] = template.Must(template.ParseFiles("static/templates/other.html", "static/templates/base.html"))
 
 	pagedata := &Page{Tags: &Tags{Id: 1, Name: "golang"},
-		Content: &Content{Id: 9, Title: "Hello", Content: "World!"},
-		Comment: &Comment{Id: 2, Note: "Good Day!"}}
+		Content:  &Content{Id: 9, Title: "Hello", Content: "World!"},
+		Projects: projects,
+		Comment:  &Comment{Id: 2, Note: "Good Day!"}}
 
 	tmpl["index.html"].ExecuteTemplate(w, "base", pagedata)
 }

@@ -1,3 +1,13 @@
 {{define "content"}}
 	<b>~{{.Content.Content}}~</b>
+
+	{{if .Projects.HasProjects }}
+		<ol>
+		{{range .Projects}}
+	        <li>{{.Id}} - {{.Name}}</li>
+	    {{end}}
+		</ol>
+	{{else}}
+		No Projects!!!
+    {{end}}
 {{end}}
