@@ -15,13 +15,9 @@ func MakeMuxer(prefix string, db *sql.DB) http.Handler {
 	} else {
 		m = mux.NewRouter().PathPrefix(prefix).Subrouter()
 	}
-
 	m.HandleFunc("/", makeHandler(Dashboard, db))
-
 	m.HandleFunc("/{path:.*}", makeHandler(NotFoundFunc, db))
-
 	return m
-
 }
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, *sql.DB), db *sql.DB) http.HandlerFunc {

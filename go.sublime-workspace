@@ -523,15 +523,7 @@
 			"file": "src/litmosauthor.com/unison/app.go",
 			"settings":
 			{
-				"buffer_size": 2933,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Users/jaredwarren/AppData/Roaming/Sublime Text 3/Packages/GoSublime/9o.md",
-			"settings":
-			{
-				"buffer_size": 5168,
+				"buffer_size": 1088,
 				"line_ending": "Unix"
 			}
 		},
@@ -684,6 +676,8 @@
 	],
 	"file_history":
 	[
+		"/C/data/www/mobile/media/html/sencha_sample1/index.html",
+		"/C/Users/jaredwarren/AppData/Roaming/Sublime Text 3/Packages/GoSublime/9o.md",
 		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/other.html",
 		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/404.html",
 		"/C/data/www/go/go.sublime-project",
@@ -809,9 +803,7 @@
 		"/C/data/www/mobile/resources/sass/ri/default/_survey.scss",
 		"/C/Users/jaredwarren/Desktop/TEMP/_quiz.scss",
 		"/C/data/www/mobile/resources/sass/ri/default/_wordgame.scss",
-		"/C/data/www/mobile/resources/sass/ri/default/_quiz.scss",
-		"/C/Users/jaredwarren/Desktop/TEMP/_survey.scss",
-		"/C/data/www/mobile/app/page/components/TextImagePopup.js"
+		"/C/data/www/mobile/resources/sass/ri/default/_quiz.scss"
 	],
 	"find":
 	{
@@ -855,6 +847,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"validPath",
+			"makeHandler",
 			"Project",
 			"reflectx",
 			"errors",
@@ -980,8 +974,6 @@
 			"questionText",
 			"questiontext",
 			"questionText",
-			"questiontext",
-			"questionText",
 			"questiontext"
 		],
 		"highlight": true,
@@ -1047,7 +1039,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1056,15 +1048,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2933,
+						"buffer_size": 1088,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2554,
-								2554
+								708,
+								708
 							]
 						],
 						"settings":
@@ -1073,43 +1065,14 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 936.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/Users/jaredwarren/AppData/Roaming/Sublime Text 3/Packages/GoSublime/9o.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5168,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2374,
-								2374
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 247.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 1,
 					"file": "src/litmosauthor.com/unison/project/project.go",
 					"semi_transient": false,
 					"settings":
@@ -1121,8 +1084,8 @@
 						"selection":
 						[
 							[
-								1167,
-								1167
+								1296,
+								1296
 							]
 						],
 						"settings":
@@ -1131,14 +1094,14 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 156.0,
+						"translation.y": 2262.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 2,
 					"file": "src/litmosauthor.com/unison/project/muxer.go",
 					"semi_transient": false,
 					"settings":
@@ -1169,11 +1132,11 @@
 			]
 		},
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
-					"buffer": 4,
+					"buffer": 3,
 					"file": "src/litmosauthor.com/unison/static/templates/base.html",
 					"semi_transient": false,
 					"settings":
@@ -1198,11 +1161,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 4,
 					"file": "src/litmosauthor.com/unison/static/templates/index.html",
 					"semi_transient": false,
 					"settings":
@@ -1230,7 +1193,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "src/litmosauthor.com/unison/static/templates/content.html",
 					"semi_transient": false,
 					"settings":
@@ -1248,7 +1211,8 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,

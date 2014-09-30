@@ -4,13 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	//"html/template"
-	"net/http"
-	"regexp"
-	//"net"
 	"log"
-	//"io/ioutil"
+	"net/http"
 
+	"litmosauthor.com/unison/ini"
 	"litmosauthor.com/unison/project"
 
 	"database/sql"
@@ -26,98 +23,46 @@ type Page struct {
 	Body  []byte
 }
 
-var validPath = regexp.MustCompile("^/(edit|save|view|home)/([a-zA-Z0-9]+)$")
-
-func makeHandler(fn func(http.ResponseWriter, *http.Request, *sql.DB)) http.HandlerFunc {
-	// do some checking, e.g. db - alpha or beta
-	return func(w http.ResponseWriter, r *http.Request) {
-		fn(w, r, alphaDB)
-	}
-}
-
-/*
-func notFoundHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	executeTemplate(w, "404", nil)
-	db, _ := sql.Open("mysql", "user:password@/dbname")
-	age := 27
-    rows, err := db.Query("SELECT name FROM users WHERE age=?", age)
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer rows.Close()
-    for rows.Next() {
-        var name string
-        if err := rows.Scan(&name); err != nil {
-                log.Fatal(err)
-        }
-        fmt.Printf("%s is %d\n", name, age)
-    }
-    if err := rows.Err(); err != nil {
-        log.Fatal(err)
-    }
-}
-*/
-
-/*func homeHandler(res http.ResponseWriter, req *http.Request, db *sql.DB) {
-	fmt.Println("home")
-	cust_id := "unison"
-	rows, err := db.Query("SELECT project_name FROM project WHERE cust_id=?", cust_id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("--%s--\n", name)
-	}
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	p := &Page{Title: "title", Body: []byte("body")}
-	executeTemplate(res, "home", p)
-}
-
-var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
-
-func executeTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	fmt.Printf("Template:" + tmpl)
-	err := templates.ExecuteTemplate(w, tmpl+".html", p)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}*/
-
-// http://www.gorillatoolkit.org/pkg/mux
 var router = mux.NewRouter()
 
 var alphaDB *sql.DB
 
+var config ini.Dict
+var err error
+
 //var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 func main() {
-	r := router
+	config, err = ini.Load("ini/config.ini")
+	if err != nil {
+		log.Fatal("Failed to load config")
+	}
 
 	// setup DB
-	// TODO: select alpha or beta db based on cust id/subdomain
-	var err error
-	// TODO:replace with real password.
-	alphaDB, err = sql.Open("mysql", "webuser:(^#F$nt45T!c.?-)@/alpha")
+	dbName, found := config.GetString("alphadb", "name")
+	if !found {
+		log.Fatal("Couldn't get name")
+	}
+	dbUser, found := config.GetString("alphadb", "user")
+	if !found {
+		log.Fatal("Couldn't get user")
+	}
+	dbPassword, found := config.GetString("alphadb", "password")
+	if !found {
+		log.Fatal("Couldn't get password")
+	}
+	alphaDB, err = sql.Open("mysql", fmt.Sprintf("%s:%s@/%s", dbUser, dbPassword, dbName))
 	if err != nil {
 		log.Fatal(err)
 	}
+	// TODO: select alpha or beta db based on cust id/subdomain
 
 	// Routs
-	//r.HandleFunc("/", makeHandler(project.Dashboard))
+	r := router
 	http.Handle("/project/", project.MakeMuxer("/project/", alphaDB))
-	//r.HandleFunc("/project/", project.makeHandler("/project/"))
 
 	// wait for clients
 	http.Handle("/", r)
 	fmt.Println("Running...\n")
 	http.ListenAndServe(":8080", nil)
-	//http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }
