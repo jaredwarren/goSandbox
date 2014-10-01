@@ -7,8 +7,10 @@ import (
 	"log"
 	"net/http"
 
+	//"litmosauthor.com/unison/common"
 	"litmosauthor.com/unison/ini"
 	"litmosauthor.com/unison/project"
+	//"litmosauthor.com/unison/user"
 
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
@@ -29,6 +31,10 @@ var alphaDB *sql.DB
 
 var config ini.Dict
 var err error
+
+/*type MyRequest struct {
+	Request *http.Request
+}*/
 
 //var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
@@ -60,6 +66,7 @@ func main() {
 	// Routs
 	r := router
 	http.Handle("/project/", project.MakeMuxer("/project/", alphaDB))
+	//http.Handle("/project/", user.MakeMuxer("/user/", alphaDB))
 
 	// wait for clients
 	http.Handle("/", r)

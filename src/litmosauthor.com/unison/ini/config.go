@@ -16,6 +16,7 @@ type Dict map[string]map[string]string
 
 type Error string
 
+// these regex's are crap, they don't parse the config properly.
 var (
 	regDoubleQuote = regexp.MustCompile("^([^= \t]+)[ \t]*=[ \t]*\"([^\"]*)\"$")
 	regSingleQuote = regexp.MustCompile("^([^= \t]+)[ \t]*=[ \t]*'([^']*)'$")

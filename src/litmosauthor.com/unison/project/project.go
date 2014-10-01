@@ -6,33 +6,11 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
+	"litmosauthor.com/unison/common"
 	"log"
 	"net/http"
 	//"reflect"
 )
-
-type Tags struct {
-	Id   int
-	Name string
-}
-
-type Content struct {
-	Id      int
-	Title   string
-	Content string
-}
-
-type Comment struct {
-	Id   int
-	Note string
-}
-
-type Page struct {
-	Tags     *Tags
-	Content  *Content
-	Comment  *Comment
-	Projects Projects
-}
 
 type Projects []Project
 
@@ -74,6 +52,13 @@ func getProjects(db *sql.DB) Projects {
 	return projects
 }
 
+type ProjectPage struct {
+	Tags     *common.Tags
+	Content  *common.Content
+	Comment  *common.Comment
+	Projects Projects
+}
+
 func Dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("Project::Dashboard")
 
@@ -85,10 +70,10 @@ func Dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	tmpl["index.html"] = template.Must(template.ParseFiles("static/templates/index.html", "static/templates/content.html", "static/templates/base.html"))
 	tmpl["other.html"] = template.Must(template.ParseFiles("static/templates/other.html", "static/templates/base.html"))
 
-	pagedata := &Page{Tags: &Tags{Id: 1, Name: "golang"},
-		Content:  &Content{Id: 9, Title: "Hello", Content: "World!"},
+	pagedata := &ProjectPage{Tags: &common.Tags{Id: 1, Name: "golang"},
+		Content:  &common.Content{Id: 9, Title: "Hello", Content: "World!"},
 		Projects: projects,
-		Comment:  &Comment{Id: 2, Note: "Good Day!"}}
+		Comment:  &common.Comment{Id: 2, Note: "Good Day!"}}
 
 	tmpl["index.html"].ExecuteTemplate(w, "base", pagedata)
 }
