@@ -5,7 +5,9 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"html/template"
 	"net/http"
+	"strings"
 )
 
 type Tags struct {
@@ -37,9 +39,45 @@ func MakeHandler(fn func(http.ResponseWriter, *http.Request, *sql.DB), db *sql.D
 	}
 }
 
+func StaticHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	path := vars["path"]
+	fmt.Println("Path:", path)
+	http.FileServer(http.Dir("./"))
+
+}
+
 func NotFoundFunc(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	vars := mux.Vars(r)
 	category := vars["path"]
 	fmt.Println("Project::NotFoundFunc - " + category)
 	fmt.Printf("404 - %s", category)
+}
+
+func GetCustId(w http.ResponseWriter, r *http.Request) string {
+	//The Host that the user queried.
+	host := r.URL.Host
+	//host := "asdf.litmosauthor.com"
+	//fmt.Printf("%+v\n", host)
+	host = strings.TrimSpace(host)
+	//Figure out if a subdomain exists in the host given.
+	host_parts := strings.Split(host, ".")
+	if len(host_parts) > 2 {
+		//The subdomain exists, we store it as the first element
+		//in a new array
+		//subdomain := []string{host_parts[0]}
+		return host_parts[0]
+	}
+	//http.Error(w, err.Error(), http.StatusInternalServerError)
+	return "none"
+}
+
+var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
+
+func executeTemplate(w http.ResponseWriter, tmpl string) {
+	fmt.Printf("Project Template:" + tmpl)
+	err := templates.ExecuteTemplate(w, tmpl+".html", nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

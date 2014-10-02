@@ -17,6 +17,6 @@ func MakeMuxer(prefix string, db *sql.DB) http.Handler {
 		m = mux.NewRouter().PathPrefix(prefix).Subrouter()
 	}
 	m.HandleFunc("/", common.MakeHandler(Dashboard, db))
-	m.HandleFunc("/{path:.*}", common.MakeHandler(common.NotFoundFunc, db))
+	//m.HandleFunc("/{path:.*}", common.MakeHandler(common.NotFoundFunc, db))
 	return m
 }

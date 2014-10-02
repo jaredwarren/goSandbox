@@ -10,7 +10,7 @@ import (
 	//"litmosauthor.com/unison/common"
 	"litmosauthor.com/unison/ini"
 	"litmosauthor.com/unison/project"
-	//"litmosauthor.com/unison/user"
+	"litmosauthor.com/unison/user"
 
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
@@ -31,10 +31,6 @@ var alphaDB *sql.DB
 
 var config ini.Dict
 var err error
-
-/*type MyRequest struct {
-	Request *http.Request
-}*/
 
 //var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
@@ -61,12 +57,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// TODO: select alpha or beta db based on cust id/subdomain
+	// TODO: select alpha or beta db based on cust id/subdomain, need a list of db refs
 
 	// Routs
 	r := router
+	//r.HandleFunc("/static/{path:.*}", common.StaticHandler)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.Handle("/project/", project.MakeMuxer("/project/", alphaDB))
-	//http.Handle("/project/", user.MakeMuxer("/user/", alphaDB))
+	http.Handle("/user/", user.MakeMuxer("/user/", alphaDB))
 
 	// wait for clients
 	http.Handle("/", r)
