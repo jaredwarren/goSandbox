@@ -142,8 +142,8 @@
 
           <div class="indent" layout vertical flex>
               <div class="header">{{userDefaults ? 'Your Profile' : 'Sign In'}}</div>
-              <paper-input label="Login" id="username"></paper-input>
-              <paper-input label="password" id="password" type="password"></paper-input>
+              <paper-input label="Login" id="username" name="username"></paper-input>
+              <paper-input label="password" id="password" type="password" name="password"></paper-input>
           </div>
 
           <div horizontal center layout>
@@ -159,6 +159,7 @@
 
 <script>
   Polymer('user-login', {
+    params: {},
     // tab through the input fields on "Enter"
     keypressAction: function(ev) {
       var code = ev.keyCode || ev.charCode;
@@ -206,7 +207,16 @@
         password: this.$.password.value
       }
       this.$.loginAjax.go();
+      // why doesn't the form submit the name/value????
       //this.$.loginForm.submit();
+    },
+
+    handleResponse: function(e, f, g) {
+      debugger;
+    },
+
+    errorHandleResponse: function(e, f, g) {
+      debugger;
     },
 
     handleLogout: function() {
