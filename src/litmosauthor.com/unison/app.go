@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	//"litmosauthor.com/unison/common"
+	//"litmosauthor.com/unison/bcrypt"
 	"litmosauthor.com/unison/ini"
 	"litmosauthor.com/unison/project"
 	"litmosauthor.com/unison/user"
@@ -58,6 +59,30 @@ func main() {
 		log.Fatal(err)
 	}
 	// TODO: select alpha or beta db based on cust id/subdomain, need a list of db refs
+
+	// hash and verify a password with random salt
+	/*
+
+		//password2 := "$5$rounds=100000$fd37fa1308ad6d1d$VBIe6L0E2keL3Ne4KS0z44/44qina3HekS6pmWn5R5C"
+		//password2 := []byte("fd37fa1308ad6d1d$VBIe6L0E2keL3Ne4KS0z44/44qina3HekS6pmWn5R5C")
+		//data := []byte("admin1") // const Size = 32 bytes
+		//password := []byte("admin1")
+		password := "admin1"
+
+		TODO: fiture out how to hash like php crypt
+
+		salt, _ := bcrypt.Salt(10000)
+		fmt.Printf("Salt: %s\n", salt)
+		hash, _ := bcrypt.Hash(password, salt)
+
+		if bcrypt.Match(password, hash) {
+			fmt.Println("They match")
+		} else {
+			fmt.Println("NO match")
+		}
+
+		fmt.Printf("SHA256 checksum : %v\n", hash)
+	*/
 
 	// Routs
 	r := router

@@ -21,18 +21,20 @@ type User struct {
 }
 
 func LoginUser(username string, password string, db *sql.DB) (user *User, err error) {
-	rows, err := db.Query("SELECT user_id, login, password, fullname, cust_id FROM user WHERE login=? LIMIT 1", username)
+	// TODO: hash password, and add to query
 
+	// query db
+	rows, err := db.Query("SELECT user_id, login, password, fullname, cust_id FROM user WHERE login=? LIMIT 1", username)
 	if err != nil {
 		return user, err
 	}
 	defer rows.Close()
+	// populate new user
 	for rows.Next() {
 		user = &User{}
 		if err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Name, &user.CustId); err != nil {
 			return user, err
 		}
-		//projects = append(projects, project)
 	}
 	if err := rows.Err(); err != nil {
 		return user, err
@@ -40,7 +42,6 @@ func LoginUser(username string, password string, db *sql.DB) (user *User, err er
 	if user == nil {
 		return user, errors.New("Can't find user")
 	}
-
 	return user, nil
 }
 
