@@ -48,38 +48,6 @@
       padding: 0 2px;
     }
 
-    .topeka-avatar {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      display: inline-block;
-      overflow: hidden;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-
-    .avatar-wrapper {
-      display: inline-block;
-      padding: 2px;
-      margin: 6px 0;
-    }
-
-    .avatar-wrapper.core-selected {
-      background-color: #00BCD4;
-      border-radius: 50%;
-    }
-
-    .avatar-dummy {
-      width: 68px;
-      height: 0px;
-    }
-
-    #avatarList {
-      margin: 16px 0 8px 0;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
     #check {
       width: 56px;
       height: 56px;
@@ -130,27 +98,25 @@
   <div class="main" flex layout vertical cross-fade-delayed?="{{parentElement.lastSelected === 'splash'}}">
     <div class="card {{ {wide: wide} | tokenList }}" flex layout vertical slide-up-offscreen?="{{parentElement.selected === 'profile'}}" cross-fade="{{!wide && parentElement.selected !== 'profile'}}">
       <div layout vertical flex cross-fade-delayed?="{{parentElement.lastSelected !== 'splash' && wide}}" on-keypress="{{ keypressAction }}">
-        <form action="/user/login/" method="post" id="loginForm">
-          <core-ajax
-            id="loginAjax"
-            url="/user/login/"
-            params="{{params}}"
-            method="post"
-            handleAs="json"
-            on-core-response="{{handleResponse}}"
-            on-core-error="{{errorHandleResponse}}"></core-ajax>
+        <core-ajax
+          id="loginAjax"
+          url="/user/login/"
+          params="{{params}}"
+          method="post"
+          handleAs="json"
+          on-core-response="{{handleResponse}}"
+          on-core-error="{{errorHandleResponse}}"></core-ajax>
 
-          <div class="indent" layout vertical flex>
-              <div class="header">{{userDefaults ? 'Your Profile' : 'Sign In'}}</div>
-              <paper-input label="Login" id="username" name="username"></paper-input>
-              <paper-input label="password" id="password" type="password" name="password"></paper-input>
-          </div>
+        <div class="indent" layout vertical flex>
+            <div class="header">{{userDefaults ? 'Your Profile' : 'Sign In'}}</div>
+            <paper-input label="Login" id="username" name="userx"></paper-input>
+            <paper-input label="password" id="password" type="password" name="passX"></paper-input>
+        </div>
 
-          <div horizontal center layout>
-            <div flex></div>
-            <paper-fab id="check" icon="check" showing?="{{$.username.inputValue.length && $.password.inputValue.length && selectedAvatar !== undefined}}" on-tap="{{handleLogin}}"></paper-fab>
-          </div>
-        </form>
+        <div horizontal center layout>
+          <div flex></div>
+          <paper-fab id="check" icon="check" showing?="{{$.username.inputValue.length && $.password.inputValue.length}}" on-tap="{{handleLogin}}"></paper-fab>
+        </div>
       </div>
     </div>
   </div>
@@ -166,40 +132,16 @@
       var key = ev.keyIdentifier;
       if (key === 'Enter' || code === 13) {
         var target = ev.target;
-        if (target === this.$.first) {
-          // TODO(dfreedm): calling the focus event handler in lieu of a real api
+        if (target === this.$.username) {
           this.$.password.focusAction();
         } else if (target === this.$.password) {
-          // after "last" field, lower keyboard to show avatar list
           this.$.password.blur();
+          this.handleLogin();
         }
       }
     },
 
-    ready: function() {
-      if (!this.user) {
-        this.selectRandomAvatar();
-      }
-    },
-
-    selectRandomAvatar: function() {
-      this.selectedAvatar = Math.floor(Math.random() * 16);
-    },
-
-    userDefaultsChanged: function() {
-      if (this.userDefaults) {
-        var n = this.userDefaults.name;
-        this.$.username.value = n.substring(0, n.length-2);
-        this.$.password.value = n[n.length-1];
-        this.selectedAvatar = this.userDefaults.avatar - 1;
-        this.score = this.userDefaults.score;
-      } else {
-        this.$.username.value = '';
-        this.$.password.value = '';
-        this.selectRandomAvatar();
-        this.score = 0;
-      }
-    },
+    ready: function() {},
 
     handleLogin: function() {
       this.params = {
@@ -207,21 +149,14 @@
         password: this.$.password.value
       }
       this.$.loginAjax.go();
-      // why doesn't the form submit the name/value????
-      //this.$.loginForm.submit();
     },
 
     handleResponse: function(e, f, g) {
-      debugger;
+      window.location.href = "/user/dashboard/";
     },
 
     errorHandleResponse: function(e, f, g) {
-      debugger;
-    },
-
-    handleLogout: function() {
-      this.user = null;
-      this.userDefaults = null;
+      alert("Access Denied")
     }
   });
 </script>

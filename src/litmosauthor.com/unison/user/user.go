@@ -2,11 +2,14 @@ package user
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/securecookie"
 	"html/template"
 	"litmosauthor.com/unison/common"
+	"log"
 	"net/http"
 )
 
@@ -26,6 +29,7 @@ func LoginUser(username string, password string, db *sql.DB) (user *User, err er
 	// query db
 	rows, err := db.Query("SELECT user_id, login, password, fullname, cust_id FROM user WHERE login=? LIMIT 1", username)
 	if err != nil {
+		log.Fatal(err)
 		return user, err
 	}
 	defer rows.Close()
@@ -33,10 +37,12 @@ func LoginUser(username string, password string, db *sql.DB) (user *User, err er
 	for rows.Next() {
 		user = &User{}
 		if err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Name, &user.CustId); err != nil {
+			log.Fatal(err)
 			return user, err
 		}
 	}
 	if err := rows.Err(); err != nil {
+		log.Fatal(err)
 		return user, err
 	}
 	if user == nil {
@@ -45,8 +51,40 @@ func LoginUser(username string, password string, db *sql.DB) (user *User, err er
 	return user, nil
 }
 
+func setSession(userName string, w http.ResponseWriter) {
+	value := map[string]string{
+		"name": userName,
+	}
+	if encoded, err := cookieHandler.Encode("session", value); err == nil {
+		cookie := &http.Cookie{
+			Name:  "session",
+			Value: encoded,
+			Path:  "/",
+		}
+		http.SetCookie(w, cookie)
+	}
+}
+
+var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
+
+func getUserName(r *http.Request) (userName string) {
+	if cookie, err := r.Cookie("session"); err == nil {
+		cookieValue := make(map[string]string)
+		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+			userName = cookieValue["name"]
+		}
+	}
+	return userName
+}
+
 func loginForm(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("User::Login")
+	userName := getUserName(r)
+	if userName != "" {
+		http.Redirect(w, r, "/user/dashboard/", 302)
+		return
+	}
+
 	// for now parse every request so I don't have to recompile, maybe
 	//tmpl := make(map[string]*template.Template)
 	tmpl := template.Must(template.ParseFiles("static/templates/user/index.html", "static/templates/user/base.html"))
@@ -63,16 +101,51 @@ func login(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	password := r.FormValue("password")
 
 	user, err := LoginUser(username, password, db)
+	fmt.Println(user)
 	if err != nil {
-		// todo throw error
-		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprintf(w, "Invalid User")
-		//http.Error(w, "Invalid User", 401)
+		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 		return
 	}
 
-	// TOOD redirect
-	fmt.Println(user)
+	setSession(username, w)
+
+	// TODO: create response struct and json that.
+	json, _ := json.Marshal(user)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
+}
+
+func logout(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	clearSession(w)
+	http.Redirect(w, r, "/", 302)
+}
+
+func clearSession(w http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:   "session",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, cookie)
+}
+
+func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	fmt.Println("User::Dishboard")
+	userName := getUserName(r)
+	if userName == "" {
+		http.Redirect(w, r, "/user/login/", 302)
+		return
+	}
+
+	// for now parse every request so I don't have to recompile, maybe
+	tmpl := template.Must(template.ParseFiles("static/templates/user/dashboard/index.html", "static/templates/user/base.html"))
+
+	pagedata := &common.Page{Tags: &common.Tags{Id: 1, Name: "golang"},
+		Content: &common.Content{Id: 9, Title: "Hello", Content: "World!"},
+		Comment: &common.Comment{Id: 2, Note: "Good Day!"}}
+
+	tmpl.ExecuteTemplate(w, "base", pagedata)
 }
 
 //var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
