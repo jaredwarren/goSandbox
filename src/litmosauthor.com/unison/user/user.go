@@ -51,8 +51,8 @@ func LoginUser(username string, password string, db *sql.DB) (user *User, err er
 	return user, nil
 }
 
-func setSession(userName string, w http.ResponseWriter) {
-	value := map[string]string{
+func setSession(userName User, w http.ResponseWriter) {
+	value := map[string]User{
 		"name": userName,
 	}
 	if encoded, err := cookieHandler.Encode("session", value); err == nil {
@@ -67,7 +67,7 @@ func setSession(userName string, w http.ResponseWriter) {
 
 var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
-func getUserName(r *http.Request) (userName string) {
+func getUserName(r *http.Request) (userName User) {
 	if cookie, err := r.Cookie("session"); err == nil {
 		cookieValue := make(map[string]string)
 		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
@@ -107,7 +107,7 @@ func login(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	setSession(username, w)
+	setSession(user, w)
 
 	// TODO: create response struct and json that.
 	json, _ := json.Marshal(user)
