@@ -67,9 +67,9 @@ func setSession(userName User, w http.ResponseWriter) {
 
 var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
-func getUserName(r *http.Request) (userName User) {
+func getUserName(r *http.Request) (userName *User) {
 	if cookie, err := r.Cookie("session"); err == nil {
-		cookieValue := make(map[string]string)
+		cookieValue := make(map[string]*User)
 		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
 			userName = cookieValue["name"]
 		}
@@ -80,7 +80,7 @@ func getUserName(r *http.Request) (userName User) {
 func loginForm(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("User::Login")
 	userName := getUserName(r)
-	if userName != "" {
+	if userName != nil {
 		http.Redirect(w, r, "/user/dashboard/", 302)
 		return
 	}
@@ -101,13 +101,12 @@ func login(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	password := r.FormValue("password")
 
 	user, err := LoginUser(username, password, db)
-	fmt.Println(user)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 		return
 	}
 
-	setSession(user, w)
+	setSession(*user, w)
 
 	// TODO: create response struct and json that.
 	json, _ := json.Marshal(user)
@@ -133,7 +132,7 @@ func clearSession(w http.ResponseWriter) {
 func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("User::Dishboard")
 	userName := getUserName(r)
-	if userName == "" {
+	if userName == nil {
 		http.Redirect(w, r, "/user/login/", 302)
 		return
 	}
