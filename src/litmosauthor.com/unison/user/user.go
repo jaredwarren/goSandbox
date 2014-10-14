@@ -147,6 +147,25 @@ func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	tmpl.ExecuteTemplate(w, "base", pagedata)
 }
 
+func dashboardApp(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	fmt.Println("User::Dishboard")
+	userName := getUserName(r)
+	if userName == nil {
+		http.Redirect(w, r, "/user/login/", 302)
+		return
+	}
+
+	// for now parse every request so I don't have to recompile, maybe
+	// // TODO: create dasboard base
+	tmpl := template.Must(template.ParseFiles("static/templates/user/dashboard/dashboard-app.html"))
+
+	pagedata := &common.Page{Tags: &common.Tags{Id: 1, Name: "golang"},
+		Content: &common.Content{Id: 9, Title: "Hello", Content: "World!"},
+		Comment: &common.Comment{Id: 2, Note: "Good Day!"}}
+
+	tmpl.ExecuteTemplate(w, "dashboardApp", pagedata)
+}
+
 //var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
 
 /*func executeTemplate(w http.ResponseWriter, tmpl string) {
