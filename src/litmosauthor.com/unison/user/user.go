@@ -11,23 +11,27 @@ import (
 	"litmosauthor.com/unison/common"
 	"log"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
+
+	// TODO: import this
+	//"github.com/karlseguin/typed"
 )
 
 type Users []User
 
 type User struct {
-	Id       string `db:"user_id"`
-	Username string `db:"login"`
-	Password string `db:"password"`
-	Name     string `db:"fullname"`
-	CustId   string `db:"cust_id"`
+	Id           string `db:"user_id"`
+	Username     string `db:"login"`
+	Password     string `db:"password"`
+	PasswordHash []byte `db:"password2"`
+	Name         string `db:"fullname"`
+	CustId       string `db:"cust_id"`
 }
 
 func LoginUser(username string, password string, db *sql.DB) (user *User, err error) {
-	// TODO: hash password, and add to query
-
 	// query db
-	rows, err := db.Query("SELECT user_id, login, password, fullname, cust_id FROM user WHERE login=? LIMIT 1", username)
+	rows, err := db.Query("SELECT user_id, login, password, password2, fullname, cust_id FROM user WHERE login=? LIMIT 1", username)
 	if err != nil {
 		log.Fatal(err)
 		return user, err
@@ -36,18 +40,24 @@ func LoginUser(username string, password string, db *sql.DB) (user *User, err er
 	// populate new user
 	for rows.Next() {
 		user = &User{}
-		if err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Name, &user.CustId); err != nil {
-			log.Fatal(err)
-			return user, err
+		if err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.PasswordHash, &user.Name, &user.CustId); err != nil {
+			fmt.Println("query scan error")
+			return user, errors.New("Can't find user")
 		}
 	}
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-		return user, err
+		fmt.Println("rows error")
+		return user, errors.New("Can't find user")
 	}
 	if user == nil {
 		return user, errors.New("Can't find user")
 	}
+	// hash password
+	err = bcrypt.CompareHashAndPassword(user.PasswordHash, []byte(password))
+	if err != nil {
+		return user, errors.New("Invalid Password")
+	}
+
 	return user, nil
 }
 
@@ -102,7 +112,7 @@ func login(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	user, err := LoginUser(username, password, db)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 
@@ -116,7 +126,7 @@ func login(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func logout(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	clearSession(w)
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/user/login/", 302)
 }
 
 func clearSession(w http.ResponseWriter) {
@@ -148,7 +158,6 @@ func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func dashboardApp(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	fmt.Println("User::Dishboard")
 	userName := getUserName(r)
 	if userName == nil {
 		http.Redirect(w, r, "/user/login/", 302)
@@ -165,13 +174,3 @@ func dashboardApp(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	tmpl.ExecuteTemplate(w, "dashboardApp", pagedata)
 }
-
-//var templates = template.Must(template.ParseFiles("static/templates/404.html", "static/templates/home.html"))
-
-/*func executeTemplate(w http.ResponseWriter, tmpl string) {
-	fmt.Printf("Project Template:" + tmpl)
-	err := templates.ExecuteTemplate(w, tmpl+".html", nil)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}*/

@@ -1,0 +1,644 @@
+<!-- <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../bower_components/core-menu/core-submenu.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
+
+<link rel="import" href="../bower_components/core-animated-pages/transitions/cross-fade.html">
+<link rel="import" href="../bower_components/core-animated-pages/transitions/slide-from-right.html">
+
+<link rel="import" href="page/Image-Mouseover/Image-Mouseover.html">
+<link rel="import" href="page/page-components/text-image/text-image.html">
+
+
+<link rel="import" href="components/randomize-elements/randomize-elements.html">
+<link rel="import" href="components/table-of-contents/table-of-contents.html">
+<link rel="import" href="main-scaffold.html">
+<link rel="import" href="page-carousel.html">
+<link rel="import" href="collapse-toolbar.html">
+ -->
+<link rel="import" href="flip-card/flip-card.html">
+
+
+<polymer-element name="game-board" layout fit>
+  <template>
+    <style type="text/css">
+      flip-card{
+        width: 60px;
+        height: 60px;
+      }
+      front{
+        color: white;
+        background-color: black;
+      }
+      back{
+        color: black;
+        background-color: darkgray;
+      }
+    </style>
+
+    <table>
+      <tr>
+        <td id="A1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A1</front>
+            <back layout horizontal center-center>A1</back>
+          </flip-card></td>
+        <td id="A2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A2</front>
+            <back layout horizontal center-center>A2</back>
+          </flip-card></td>
+        <td id="A3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A3</front>
+            <back layout horizontal center-center>A3</back>
+          </flip-card></td>
+        <td id="A4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A4</front>
+            <back layout horizontal center-center>A4</back>
+          </flip-card></td>
+        <td id="A5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A5</front>
+            <back layout horizontal center-center>A5</back>
+          </flip-card></td>
+        <td id="A6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A6</front>
+            <back layout horizontal center-center>A6</back>
+          </flip-card></td>
+        <td id="A7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A7</front>
+            <back layout horizontal center-center>A7</back>
+          </flip-card></td>
+        <td id="A8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A8</front>
+            <back layout horizontal center-center>A8</back>
+          </flip-card></td>
+        <td id="A9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A9</front>
+            <back layout horizontal center-center>A9</back>
+          </flip-card></td>
+        <td id="A10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A10</front>
+            <back layout horizontal center-center>A10</back>
+          </flip-card></td>
+        <td id="A11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A11</front>
+            <back layout horizontal center-center>A11</back>
+          </flip-card></td>
+        <td id="A12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>A12</front>
+            <back layout horizontal center-center>A12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="B1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B1</front>
+            <back layout horizontal center-center>B1</back>
+          </flip-card></td>
+        <td id="B2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B2</front>
+            <back layout horizontal center-center>B2</back>
+          </flip-card></td>
+        <td id="B3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B3</front>
+            <back layout horizontal center-center>B3</back>
+          </flip-card></td>
+        <td id="B4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B4</front>
+            <back layout horizontal center-center>B4</back>
+          </flip-card></td>
+        <td id="B5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B5</front>
+            <back layout horizontal center-center>B5</back>
+          </flip-card></td>
+        <td id="B6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B6</front>
+            <back layout horizontal center-center>B6</back>
+          </flip-card></td>
+        <td id="B7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B7</front>
+            <back layout horizontal center-center>B7</back>
+          </flip-card></td>
+        <td id="B8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B8</front>
+            <back layout horizontal center-center>B8</back>
+          </flip-card></td>
+        <td id="B9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B9</front>
+            <back layout horizontal center-center>B9</back>
+          </flip-card></td>
+        <td id="B10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B10</front>
+            <back layout horizontal center-center>B10</back>
+          </flip-card></td>
+        <td id="B11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B11</front>
+            <back layout horizontal center-center>B11</back>
+          </flip-card></td>
+        <td id="B12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>B12</front>
+            <back layout horizontal center-center>B12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="C1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C1</front>
+            <back layout horizontal center-center>C1</back>
+          </flip-card></td>
+        <td id="C2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C2</front>
+            <back layout horizontal center-center>C2</back>
+          </flip-card></td>
+        <td id="C3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C3</front>
+            <back layout horizontal center-center>C3</back>
+          </flip-card></td>
+        <td id="C4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C4</front>
+            <back layout horizontal center-center>C4</back>
+          </flip-card></td>
+        <td id="C5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C5</front>
+            <back layout horizontal center-center>C5</back>
+          </flip-card></td>
+        <td id="C6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C6</front>
+            <back layout horizontal center-center>C6</back>
+          </flip-card></td>
+        <td id="C7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C7</front>
+            <back layout horizontal center-center>C7</back>
+          </flip-card></td>
+        <td id="C8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C8</front>
+            <back layout horizontal center-center>C8</back>
+          </flip-card></td>
+        <td id="C9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C9</front>
+            <back layout horizontal center-center>C9</back>
+          </flip-card></td>
+        <td id="C10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C10</front>
+            <back layout horizontal center-center>C10</back>
+          </flip-card></td>
+        <td id="C11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C11</front>
+            <back layout horizontal center-center>C11</back>
+          </flip-card></td>
+        <td id="C12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>C12</front>
+            <back layout horizontal center-center>C12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="D1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D1</front>
+            <back layout horizontal center-center>D1</back>
+          </flip-card></td>
+        <td id="D2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D2</front>
+            <back layout horizontal center-center>D2</back>
+          </flip-card></td>
+        <td id="D3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D3</front>
+            <back layout horizontal center-center>D3</back>
+          </flip-card></td>
+        <td id="D4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D4</front>
+            <back layout horizontal center-center>D4</back>
+          </flip-card></td>
+        <td id="D5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D5</front>
+            <back layout horizontal center-center>D5</back>
+          </flip-card></td>
+        <td id="D6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D6</front>
+            <back layout horizontal center-center>D6</back>
+          </flip-card></td>
+        <td id="D7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D7</front>
+            <back layout horizontal center-center>D7</back>
+          </flip-card></td>
+        <td id="D8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D8</front>
+            <back layout horizontal center-center>D8</back>
+          </flip-card></td>
+        <td id="D9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D9</front>
+            <back layout horizontal center-center>D9</back>
+          </flip-card></td>
+        <td id="D10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D10</front>
+            <back layout horizontal center-center>D10</back>
+          </flip-card></td>
+        <td id="D11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D11</front>
+            <back layout horizontal center-center>D11</back>
+          </flip-card></td>
+        <td id="D12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>D12</front>
+            <back layout horizontal center-center>D12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="E1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E1</front>
+            <back layout horizontal center-center>E1</back>
+          </flip-card></td>
+        <td id="E2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E2</front>
+            <back layout horizontal center-center>E2</back>
+          </flip-card></td>
+        <td id="E3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E3</front>
+            <back layout horizontal center-center>E3</back>
+          </flip-card></td>
+        <td id="E4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E4</front>
+            <back layout horizontal center-center>E4</back>
+          </flip-card></td>
+        <td id="E5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E5</front>
+            <back layout horizontal center-center>E5</back>
+          </flip-card></td>
+        <td id="E6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E6</front>
+            <back layout horizontal center-center>E6</back>
+          </flip-card></td>
+        <td id="E7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E7</front>
+            <back layout horizontal center-center>E7</back>
+          </flip-card></td>
+        <td id="E8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E8</front>
+            <back layout horizontal center-center>E8</back>
+          </flip-card></td>
+        <td id="E9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E9</front>
+            <back layout horizontal center-center>E9</back>
+          </flip-card></td>
+        <td id="E10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E10</front>
+            <back layout horizontal center-center>E10</back>
+          </flip-card></td>
+        <td id="E11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E11</front>
+            <back layout horizontal center-center>E11</back>
+          </flip-card></td>
+        <td id="E12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>E12</front>
+            <back layout horizontal center-center>E12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="F1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F1</front>
+            <back layout horizontal center-center>F1</back>
+          </flip-card></td>
+        <td id="F2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F2</front>
+            <back layout horizontal center-center>F2</back>
+          </flip-card></td>
+        <td id="F3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F3</front>
+            <back layout horizontal center-center>F3</back>
+          </flip-card></td>
+        <td id="F4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F4</front>
+            <back layout horizontal center-center>F4</back>
+          </flip-card></td>
+        <td id="F5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F5</front>
+            <back layout horizontal center-center>F5</back>
+          </flip-card></td>
+        <td id="F6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F6</front>
+            <back layout horizontal center-center>F6</back>
+          </flip-card></td>
+        <td id="F7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F7</front>
+            <back layout horizontal center-center>F7</back>
+          </flip-card></td>
+        <td id="F8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F8</front>
+            <back layout horizontal center-center>F8</back>
+          </flip-card></td>
+        <td id="F9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F9</front>
+            <back layout horizontal center-center>F9</back>
+          </flip-card></td>
+        <td id="F10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F10</front>
+            <back layout horizontal center-center>F10</back>
+          </flip-card></td>
+        <td id="F11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F11</front>
+            <back layout horizontal center-center>F11</back>
+          </flip-card></td>
+        <td id="F12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>F12</front>
+            <back layout horizontal center-center>F12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="G1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G1</front>
+            <back layout horizontal center-center>G1</back>
+          </flip-card></td>
+        <td id="G2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G2</front>
+            <back layout horizontal center-center>G2</back>
+          </flip-card></td>
+        <td id="G3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G3</front>
+            <back layout horizontal center-center>G3</back>
+          </flip-card></td>
+        <td id="G4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G4</front>
+            <back layout horizontal center-center>G4</back>
+          </flip-card></td>
+        <td id="G5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G5</front>
+            <back layout horizontal center-center>G5</back>
+          </flip-card></td>
+        <td id="G6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G6</front>
+            <back layout horizontal center-center>G6</back>
+          </flip-card></td>
+        <td id="G7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G7</front>
+            <back layout horizontal center-center>G7</back>
+          </flip-card></td>
+        <td id="G8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G8</front>
+            <back layout horizontal center-center>G8</back>
+          </flip-card></td>
+        <td id="G9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G9</front>
+            <back layout horizontal center-center>G9</back>
+          </flip-card></td>
+        <td id="G10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G10</front>
+            <back layout horizontal center-center>G10</back>
+          </flip-card></td>
+        <td id="G11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G11</front>
+            <back layout horizontal center-center>G11</back>
+          </flip-card></td>
+        <td id="G12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>G12</front>
+            <back layout horizontal center-center>G12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="H1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H1</front>
+            <back layout horizontal center-center>H1</back>
+          </flip-card></td>
+        <td id="H2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H2</front>
+            <back layout horizontal center-center>H2</back>
+          </flip-card></td>
+        <td id="H3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H3</front>
+            <back layout horizontal center-center>H3</back>
+          </flip-card></td>
+        <td id="H4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H4</front>
+            <back layout horizontal center-center>H4</back>
+          </flip-card></td>
+        <td id="H5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H5</front>
+            <back layout horizontal center-center>H5</back>
+          </flip-card></td>
+        <td id="H6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H6</front>
+            <back layout horizontal center-center>H6</back>
+          </flip-card></td>
+        <td id="H7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H7</front>
+            <back layout horizontal center-center>H7</back>
+          </flip-card></td>
+        <td id="H8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H8</front>
+            <back layout horizontal center-center>H8</back>
+          </flip-card></td>
+        <td id="H9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H9</front>
+            <back layout horizontal center-center>H9</back>
+          </flip-card></td>
+        <td id="H10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H10</front>
+            <back layout horizontal center-center>H10</back>
+          </flip-card></td>
+        <td id="H11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H11</front>
+            <back layout horizontal center-center>H11</back>
+          </flip-card></td>
+        <td id="H12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>H12</front>
+            <back layout horizontal center-center>H12</back>
+          </flip-card></td>
+      </tr>
+      <tr>
+        <td id="I1">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I1</front>
+            <back layout horizontal center-center>I1</back>
+          </flip-card></td>
+        <td id="I2">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I2</front>
+            <back layout horizontal center-center>I2</back>
+          </flip-card></td>
+        <td id="I3">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I3</front>
+            <back layout horizontal center-center>I3</back>
+          </flip-card></td>
+        <td id="I4">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I4</front>
+            <back layout horizontal center-center>I4</back>
+          </flip-card></td>
+        <td id="I5">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I5</front>
+            <back layout horizontal center-center>I5</back>
+          </flip-card></td>
+        <td id="I6">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I6</front>
+            <back layout horizontal center-center>I6</back>
+          </flip-card></td>
+        <td id="I7">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I7</front>
+            <back layout horizontal center-center>I7</back>
+          </flip-card></td>
+        <td id="I8">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I8</front>
+            <back layout horizontal center-center>I8</back>
+          </flip-card></td>
+        <td id="I9">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I9</front>
+            <back layout horizontal center-center>I9</back>
+          </flip-card></td>
+        <td id="I10">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I10</front>
+            <back layout horizontal center-center>I10</back>
+          </flip-card></td>
+        <td id="I11">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I11</front>
+            <back layout horizontal center-center>I11</back>
+          </flip-card></td>
+        <td id="I12">
+          <flip-card on-flip="{{onFlip}}">
+            <front layout horizontal center-center>I12</front>
+            <back layout horizontal center-center>I12</back>
+          </flip-card></td>
+      </tr>
+    </table>
+
+  </template>
+  <script>
+  Polymer('game-board', {
+    first: '',
+    onFlip: function(event, detail, sender){
+        //debugger;
+        //sender.disabled = true;
+        if(this.first){
+          this.addHotel(this.first, sender.parentElement.id);
+        }
+        else{
+          this.first = sender.parentElement.id;
+        }
+    },
+    addHotel: function(tileI1d, tileI2d){
+      debugger;
+    },
+    loadPage: function(pageData){
+
+      var me = this,
+          pType = this.cleanPType(pageData.pType),
+          url = pageData.path,
+          pageCarousel = this.$.pageCarousel;
+
+      // load pate template first
+      Polymer.import( ['page/'+pType+'/'+pType+".html"], function() {
+        Polymer.import( [url], function() {
+          try{
+            var link = document.querySelector("link[href='"+url+"']");
+            var content = link.import.querySelector(pType);
+            me.currentPage = document.importNode(content, true);
+            pageCarousel.appendChild(me.currentPage);
+            me.selected++;
+          }catch(e){}
+        });
+      });
+
+
+    },
+  });
+  </script>
+</polymer-element>

@@ -109,8 +109,8 @@
 
         <div class="indent" layout vertical flex>
             <div class="header">{{userDefaults ? 'Your Profile' : 'Sign In'}}</div>
-            <paper-input label="Login" id="username" name="userx"></paper-input>
-            <paper-input label="password" id="password" type="password" name="passX"></paper-input>
+            <paper-input label="Login" id="username" name="userx" value="asdf"></paper-input>
+            <paper-input label="password" id="password" type="password" name="passX" value="asdf1234"></paper-input>
         </div>
 
         <div horizontal center layout>
@@ -151,12 +151,12 @@
       this.$.loginAjax.go();
     },
 
-    handleResponse: function(e, f, g) {
+    handleResponse: function(event, detail, sender) {
       window.location.href = "/user/dashboard/";
     },
 
-    errorHandleResponse: function(e, f, g) {
-      alert("Access Denied")
+    errorHandleResponse: function(event, detail, sender) {
+      alert(detail.response);
     }
   });
 </script>
