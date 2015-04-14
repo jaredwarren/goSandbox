@@ -63,7 +63,6 @@ func main() {
 	http.Handle("/user/", user.MakeMuxer("/user/", alphaDB))
 	// websocket
 	http.Handle("/ws/", conn.MakeMuxer("/ws/", alphaDB))
-	//http.Handle("/ws/", conn.wsHandler{h: h})
 
 	// wait for clients
 	http.Handle("/", r)

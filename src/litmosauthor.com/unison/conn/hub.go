@@ -5,7 +5,7 @@ type hub struct {
 	connections map[*connection]bool
 
 	// Inbound messages from the connections.
-	broadcast chan []byte
+	broadcast chan msg
 
 	// Register requests from the connections.
 	register chan *connection
@@ -16,7 +16,7 @@ type hub struct {
 
 func newHub() *hub {
 	return &hub{
-		broadcast:   make(chan []byte),
+		broadcast:   make(chan msg),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
 		connections: make(map[*connection]bool),

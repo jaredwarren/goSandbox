@@ -114,19 +114,19 @@ core-scaffold[mode=cover] .content {
 
         // websocket
         if (window["WebSocket"]) {
-          try{
+          try {
             this.conn = new WebSocket("ws://localhost:8080/ws/");
             this.conn.onclose = function(event) {
               me.appendLog("<div><b>Connection closed.</b></div>")
             }
             this.conn.onmessage = function(event) {
-              me.appendLog(event.data)
+              me.processResponse(JSON.parse(event.data))
             }
             this.conn.onerror = function(event) {
               console.log(event);
               me.appendLog("ERROR:");
             }
-          }catch(e){
+          } catch (e) {
             debugger;
             me.appendLog("<div><b>Connection closed.</b></div>")
           }
@@ -143,27 +143,36 @@ core-scaffold[mode=cover] .content {
 
       conn: null,
 
-      appendLog: function(msg) {
-        this.$.log.appendChild(this.injectBoundHTML(msg+"<br/>"))
-        return;
-        debugger;
-        //this.$.log.append
-        msg.appendTo(log)
-        if (doScroll) {
-          d.scrollTop = d.scrollHeight - d.clientHeight;
+      processResponse: function(response) {
+        console.log("processResponse:", response);
+        switch (response.Action) {
+          case "message":
+            this.appendLog(response.Message);
+            break;
+          default:
+            alert("Invalid Action:", response.Action);
+            break;
         }
+      },
+
+      appendLog: function(responseString) {
+        this.$.log.appendChild(this.injectBoundHTML(responseString + "<br/>"));
       },
 
 
       onSubmit: function() {
         if (!this.conn) {
-            return false;
+          return false;
         }
         var message = this.$.message.value;
         if (!message) {
-            return false;
+          return false;
         }
-        this.conn.send(message);
+        var messageJson = {
+          "Message": message,
+          "Action": "message"
+        };
+        this.conn.send(JSON.stringify(messageJson));
         this.$.message.value = ''
         return false
       },

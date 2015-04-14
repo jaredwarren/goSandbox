@@ -14,7 +14,7 @@ type connection struct {
 	ws *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	send chan msg
 
 	// The hub.
 	h *hub
@@ -22,8 +22,11 @@ type connection struct {
 
 func (c *connection) reader() {
 	for {
-		_, message, err := c.ws.ReadMessage()
+		message := msg{}
+		err := c.ws.ReadJSON(&message)
 		if err != nil {
+			fmt.Println("error", err)
+			// TODO: write filed message?
 			break
 		}
 		fmt.Println("reader:", message)
@@ -34,8 +37,10 @@ func (c *connection) reader() {
 
 func (c *connection) writer() {
 	for message := range c.send {
-		err := c.ws.WriteMessage(websocket.TextMessage, message)
+		//err := c.ws.WriteMessage(websocket.TextMessage, message)
+		err := c.ws.WriteJSON(message)
 		if err != nil {
+			// TODO: write filed message?
 			break
 		}
 		fmt.Println("writer:", message)
@@ -50,10 +55,10 @@ type wsHandler struct {
 }
 
 type msg struct {
-	Num int
+	Action  string
+	Message string
 }
 
-// TODO: make this a normal funciton like the others, so I can add pass in the user data...? or how do I get the users
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// make sure session is valid
 	userName := user.GetUserName(r)
@@ -67,15 +72,16 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	c := &connection{send: make(chan []byte, 256), ws: ws, h: wsh.h}
+	c := &connection{send: make(chan msg, 256), ws: ws, h: wsh.h}
 	c.h.register <- c
 	defer func() { c.h.unregister <- c }()
 	go c.writer()
 
-	m := msg{}
-
 	// broadcast new user
-	c.h.broadcast <- []byte("msg|New User:" + userName.Username)
+	m := msg{}
+	m.Message = "New User:" + userName.Username
+	m.Action = "message"
+	c.h.broadcast <- m
 
 	// blocking
 	c.reader()
