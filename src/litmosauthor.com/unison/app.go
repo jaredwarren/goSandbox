@@ -7,8 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	//"litmosauthor.com/unison/common"
-	//"litmosauthor.com/unison/bcrypt"
+	"litmosauthor.com/unison/conn"
 	"litmosauthor.com/unison/ini"
 	"litmosauthor.com/unison/project"
 	"litmosauthor.com/unison/user"
@@ -33,8 +32,6 @@ var alphaDB *sql.DB
 var config ini.Dict
 var err error
 
-//var store = sessions.NewCookieStore([]byte("something-very-secret"))
-
 func main() {
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
@@ -58,38 +55,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// TODO: select alpha or beta db based on cust id/subdomain, need a list of db refs
-
-	// hash and verify a password with random salt
-	/*
-
-		//password2 := "$5$rounds=100000$fd37fa1308ad6d1d$VBIe6L0E2keL3Ne4KS0z44/44qina3HekS6pmWn5R5C"
-		//password2 := []byte("fd37fa1308ad6d1d$VBIe6L0E2keL3Ne4KS0z44/44qina3HekS6pmWn5R5C")
-		//data := []byte("admin1") // const Size = 32 bytes
-		//password := []byte("admin1")
-		password := "admin1"
-
-		TODO: fiture out how to hash like php crypt
-
-		salt, _ := bcrypt.Salt(10000)
-		fmt.Printf("Salt: %s\n", salt)
-		hash, _ := bcrypt.Hash(password, salt)
-
-		if bcrypt.Match(password, hash) {
-			fmt.Println("They match")
-		} else {
-			fmt.Println("NO match")
-		}
-
-		fmt.Printf("SHA256 checksum : %v\n", hash)
-	*/
 
 	// Routs
 	r := router
-	//r.HandleFunc("/static/{path:.*}", common.StaticHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.Handle("/project/", project.MakeMuxer("/project/", alphaDB))
 	http.Handle("/user/", user.MakeMuxer("/user/", alphaDB))
+	// websocket
+	http.Handle("/ws/", conn.MakeMuxer("/ws/", alphaDB))
+	//http.Handle("/ws/", conn.wsHandler{h: h})
 
 	// wait for clients
 	http.Handle("/", r)

@@ -7,13 +7,13 @@
 <link rel="import" href="/static/components/core-animated-pages/transitions/scale-up.html">
 <link rel="import" href="/static/components/core-animated-pages/transitions/tile-cascade.html">
 <link rel="import" href="/static/components/core-menu/core-menu.html">
-  <link rel="import" href="/static/components/core-header-panel/core-header-panel.html">
-  <link rel="import" href="/static/components/core-menu/core-menu.html">
-  <link rel="import" href="/static/components/core-item/core-item.html">
-
+<link rel="import" href="/static/components/core-header-panel/core-header-panel.html">
+<link rel="import" href="/static/components/core-menu/core-menu.html">
+<link rel="import" href="/static/components/core-item/core-item.html">
+<link rel="import" href="/static/components/paper-button/paper-button.html">
 <style type="text/css">
-	
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -35,8 +35,8 @@ core-scaffold {
   height: 5000px;
   padding: 20px;
 }
-
 /* some default styles for mode="cover" on core-scaffold */
+
 core-scaffold[mode=cover]::shadow core-header-panel::shadow #mainContainer {
   left: 120px;
 }
@@ -44,197 +44,254 @@ core-scaffold[mode=cover]::shadow core-header-panel::shadow #mainContainer {
 core-scaffold[mode=cover] .content {
   margin: 20px 100px 20px 0;
 }
-
 </style>
-
 <polymer-element name="dashboard-app" attributes="user categories" vertical layout>
-<template>
-  <core-scaffold>
-    <core-header-panel navigation flex mode="seamed">
-      <core-toolbar style="background-color: #526E9C; color: #fff;">Application</core-toolbar>
-      <core-menu>
-        <core-item icon="settings" label="item1"></core-item>
-        <core-item icon="settings" label="Log Out" on-tap="{{logout}}"></core-item>
-      </core-menu>
-    </core-header-panel>
-    <div tool>Title</div>
-    <div class="content">Content ------ goes here...</div>
-  </core-scaffold>
+  <template>
+    <core-scaffold>
+      <core-header-panel navigation flex mode="seamed">
+        <core-toolbar style="background-color: #526E9C; color: #fff;">Application</core-toolbar>
+        <core-menu>
+          <core-item icon="settings" label="item1"></core-item>
+          <core-item icon="settings" label="Log Out" on-tap="{{logout}}"></core-item>
+        </core-menu>
+      </core-header-panel>
+      <div tool>Title</div>
+      <textarea id="message"></textarea>
+      <paper-button raised on-tap="{{onSubmit}}">Send</paper-button>
+      <div id="log"></div>
+    </core-scaffold>
+    <!-- <link rel="stylesheet" href="topeka-app.css"> -->
+    <!-- <user-login id="profile" name="profile" user="{{user}}" wide="{{wide}}"></user-login> -->
+    <!-- <core-media-query query="min-width: {{responsiveWidth}}" queryMatches="{{wide}}"></core-media-query> -->
+  </template>
+  <script>
+  (function() {
+    console.log("...");
+    window.setTopekaTransitionSpeed = function(ms) {
+      CoreStyle.g.transitions.duration = ms + 'ms';
+      CoreStyle.g.transitions.scaleDelay = CoreStyle.g.transitions.duration;
+    }
 
+    setTopekaTransitionSpeed(350);
 
-  <!-- <link rel="stylesheet" href="topeka-app.css"> -->
-  <!-- <user-login id="profile" name="profile" user="{{user}}" wide="{{wide}}"></user-login> -->
-  
-  
-  <!-- <core-media-query query="min-width: {{responsiveWidth}}" queryMatches="{{wide}}"></core-media-query> -->
+    Polymer('dashboard-app', {
+      selected: 'splash',
+      responsiveWidth: '900px',
+      connected: false,
+      minSplashTime: 1000,
+      disableLeaderboard: false,
+      observe: {
+        'user': 'startup'
+      },
 
-</template>
-<script>
-(function() {
-	console.log("...");
-  window.setTopekaTransitionSpeed = function(ms) {
-    CoreStyle.g.transitions.duration = ms + 'ms';
-    CoreStyle.g.transitions.scaleDelay = CoreStyle.g.transitions.duration;  
-  }
+      ready: function() {
+        var me = this;
+        console.log("ready");
+        this.test = window.location.search.indexOf('test') >= 0;
+        this.offline = this.test || window.location.search.indexOf('offline') >= 0;
 
-  setTopekaTransitionSpeed(350);
+        this.readyTime = Date.now();
 
-  Polymer('dashboard-app', {
-    selected: 'splash',
-    responsiveWidth: '900px',
-    connected: false,
-    minSplashTime: 1000,
-    disableLeaderboard: false,
-    observe: {
-      'user': 'startup'
-    },
-
-    ready: function() {
-    	console.log("ready");
-      this.test = window.location.search.indexOf('test') >= 0;
-      this.offline = this.test || window.location.search.indexOf('offline') >= 0;
-
-      this.readyTime = Date.now();
-
-      var dummyState = {app: 'topeka'};
-      // set up history state
-      if (!history.state) {
-        history.pushState(dummyState, '');
-      }
-
-      // "back" button will show categories, unless in profile screen
-      window.onpopstate = function() {
-      	console.log("window.onpopstate");
-        if (this.selected !== 'profile') {
-          this.showCategories();
+        var dummyState = {
+          app: 'topeka'
+        };
+        // set up history state
+        if (!history.state) {
+          history.pushState(dummyState, '');
         }
-        // repopulate history state so we get the popstate event again
-        history.pushState(dummyState, '');
-      }.bind(this);
 
-      if (!this.user) {
-        this.startup();
-      }
-    },
+        // "back" button will show categories, unless in profile screen
+        window.onpopstate = function() {
+          console.log("window.onpopstate");
+          if (this.selected !== 'profile') {
+            this.showCategories();
+          }
+          // repopulate history state so we get the popstate event again
+          history.pushState(dummyState, '');
+        }.bind(this);
 
-    eventDelegates: {
-      'main': 'showCategories',
-      'score-update': 'computeScore'
-    },
+        if (!this.user) {
+          this.startup();
+        }
 
-    showCategories: function() {
-    	console.log("showCategories");
-      this.selected = 'categories';
-    },
-    
-    showCategory: function() {
-    	console.log("showCategory");
-      this.selected = 'category';
-    },
-    
-    showLeaderboard: function() {
-    	console.log("showLeaderboard");
-      this.selected = 'leaderboard';
-    },
-    
-    showProfile: function() {
-    	console.log("showProfile");
-      this.selected = 'profile';
-      this.$.profile.userDefaults = this.user;
-    },
 
-    logout: function(){
-      window.location = '/user/logout/';
-    },
-    
-    categorySelect: function() {
-    	console.log("categorySelect");
-      if (this.category) {
-        var n = this.category.name;
-        if (n === 'leaderboard') {
-          this.showLeaderboard();
-        } else if (n === 'profile') {
-          this.showProfile();
+        // websocket
+        if (window["WebSocket"]) {
+          try{
+            this.conn = new WebSocket("ws://localhost:8080/ws/");
+            this.conn.onclose = function(evt) {
+              me.appendLog("<div><b>Connection closed.</b></div>")
+            }
+            this.conn.onmessage = function(evt) {
+              me.appendLog(evt.data)
+            }
+          }catch(e){
+            debugger;
+            me.appendLog("<div><b>Connection closed.</b></div>")
+          }
         } else {
-          this.showCategory();
+          me.appendLog("<div><b>Your browser does not support WebSockets.</b></div>")
         }
-      }
-    },
 
-    loadScores: function() {
-    	console.log("loadScores");
-      var pts = 0;
-      try {
-        this.allScores = JSON.parse(localStorage.getItem('topeka-scores'));
-        if (!this.allScores) {
+
+      },
+
+
+
+
+
+      conn: null,
+
+      appendLog: function(msg) {
+        this.$.log.appendChild(this.injectBoundHTML(msg+"<br/>"))
+        return;
+        debugger;
+        //this.$.log.append
+        msg.appendTo(log)
+        if (doScroll) {
+          d.scrollTop = d.scrollHeight - d.clientHeight;
+        }
+      },
+
+
+      onSubmit: function() {
+        if (!this.conn) {
+            return false;
+        }
+        var message = this.$.message.value;
+        if (!message) {
+            return false;
+        }
+        this.conn.send(message);
+        this.$.message.value = ''
+        return false
+      },
+
+
+
+
+
+
+
+
+      eventDelegates: {
+        'main': 'showCategories',
+        'score-update': 'computeScore'
+      },
+
+      showCategories: function() {
+        console.log("showCategories");
+        this.selected = 'categories';
+      },
+
+      showCategory: function() {
+        console.log("showCategory");
+        this.selected = 'category';
+      },
+
+      showLeaderboard: function() {
+        console.log("showLeaderboard");
+        this.selected = 'leaderboard';
+      },
+
+      showProfile: function() {
+        console.log("showProfile");
+        this.selected = 'profile';
+        this.$.profile.userDefaults = this.user;
+      },
+
+      logout: function() {
+        window.location = '/user/logout/';
+      },
+
+      categorySelect: function() {
+        console.log("categorySelect");
+        if (this.category) {
+          var n = this.category.name;
+          if (n === 'leaderboard') {
+            this.showLeaderboard();
+          } else if (n === 'profile') {
+            this.showProfile();
+          } else {
+            this.showCategory();
+          }
+        }
+      },
+
+      loadScores: function() {
+        console.log("loadScores");
+        var pts = 0;
+        try {
+          this.allScores = JSON.parse(localStorage.getItem('topeka-scores'));
+          if (!this.allScores) {
+            this.resetScores();
+          } else {
+            for (var n in this.allScores) {
+              pts += this.sumPts(this.allScores[n]);
+            }
+            this.user.score = pts;
+          }
+        } catch (e) {
           this.resetScores();
-        } else {
+        }
+      },
+
+      computeScore: function() {
+        console.log("computeScore");
+        if (this.user) {
+          var pts = 0;
           for (var n in this.allScores) {
             pts += this.sumPts(this.allScores[n]);
           }
           this.user.score = pts;
+          localStorage.setItem('topeka-scores', JSON.stringify(this.allScores));
         }
-      } catch (e) {
-        this.resetScores();
-      }
-    },
+      },
 
-    computeScore: function() {
-    	console.log("computeScore");
-      if (this.user) {
+      resetScores: function() {
+        console.log("resetScores");
+        localStorage.removeItem('topeka-scores');
+        if (this.user) {
+          this.user.score = 0;
+        }
+        this.allScores = {};
+      },
+
+      sumPts: function(s) {
+        console.log("sumPts");
         var pts = 0;
-        for (var n in this.allScores) {
-          pts += this.sumPts(this.allScores[n]);
+        for (var i = 0; i < s.length; i++) {
+          pts += (s[i] || 0);
         }
-        this.user.score = pts;
-        localStorage.setItem('topeka-scores', JSON.stringify(this.allScores));
-      }
-    },
+        return pts;
+      },
 
-    resetScores: function() {
-    	console.log("resetScores");
-      localStorage.removeItem('topeka-scores');
-      if (this.user) {
-        this.user.score = 0;
-      }
-      this.allScores = {};
-    },
-    
-    sumPts: function(s) {
-    	console.log("sumPts");
-      var pts = 0;
-      for (var i = 0; i < s.length; i++) {
-        pts += (s[i] || 0);
-      }
-      return pts;
-    },
-    
-    startup: function() {
-    	console.log("startup");
-      var elapsed = Date.now() - this.readyTime;
-      var t = this.minSplashTime - elapsed;
-      this.async('completeStartup', null, t > 0 ? t : 0);
-    },
-    
-    completeStartup: function() {
-    	console.log("completeStartup");
-      if (this.user) {
-        this.loadScores();
-        this.selected = 'categories';
-      } else {
-        this.resetScores();
-        this.selected = 'profile';
-      }
-    },
+      startup: function() {
+        console.log("startup");
+        var elapsed = Date.now() - this.readyTime;
+        var t = this.minSplashTime - elapsed;
+        this.async('completeStartup', null, t > 0 ? t : 0);
+      },
 
-    transitionEndAction: function() {
-    	console.log("transitionEndAction");
-      this.disableLeaderboard = (this.selected !== 'leaderboard');
-    }
-    
-  });
+      completeStartup: function() {
+        console.log("completeStartup");
+        if (this.user) {
+          this.loadScores();
+          this.selected = 'categories';
+        } else {
+          this.resetScores();
+          this.selected = 'profile';
+        }
+      },
 
-})();
-</script>
+      transitionEndAction: function() {
+        console.log("transitionEndAction");
+        this.disableLeaderboard = (this.selected !== 'leaderboard');
+      }
+
+    });
+
+  })();
+  </script>
 </polymer-element>
 {{end}}
