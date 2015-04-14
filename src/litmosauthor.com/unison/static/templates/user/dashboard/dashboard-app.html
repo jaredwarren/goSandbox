@@ -60,9 +60,6 @@ core-scaffold[mode=cover] .content {
       <paper-button raised on-tap="{{onSubmit}}">Send</paper-button>
       <div id="log"></div>
     </core-scaffold>
-    <!-- <link rel="stylesheet" href="topeka-app.css"> -->
-    <!-- <user-login id="profile" name="profile" user="{{user}}" wide="{{wide}}"></user-login> -->
-    <!-- <core-media-query query="min-width: {{responsiveWidth}}" queryMatches="{{wide}}"></core-media-query> -->
   </template>
   <script>
   (function() {
@@ -119,11 +116,15 @@ core-scaffold[mode=cover] .content {
         if (window["WebSocket"]) {
           try{
             this.conn = new WebSocket("ws://localhost:8080/ws/");
-            this.conn.onclose = function(evt) {
+            this.conn.onclose = function(event) {
               me.appendLog("<div><b>Connection closed.</b></div>")
             }
-            this.conn.onmessage = function(evt) {
-              me.appendLog(evt.data)
+            this.conn.onmessage = function(event) {
+              me.appendLog(event.data)
+            }
+            this.conn.onerror = function(event) {
+              console.log(event);
+              me.appendLog("ERROR:");
             }
           }catch(e){
             debugger;

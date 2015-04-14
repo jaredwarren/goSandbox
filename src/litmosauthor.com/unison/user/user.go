@@ -77,7 +77,7 @@ func setSession(userName User, w http.ResponseWriter) {
 
 var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
 
-func getUserName(r *http.Request) (userName *User) {
+func GetUserName(r *http.Request) (userName *User) {
 	if cookie, err := r.Cookie("session"); err == nil {
 		cookieValue := make(map[string]*User)
 		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
@@ -89,7 +89,7 @@ func getUserName(r *http.Request) (userName *User) {
 
 func loginForm(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("User::Login")
-	userName := getUserName(r)
+	userName := GetUserName(r)
 	if userName != nil {
 		http.Redirect(w, r, "/user/dashboard/", 302)
 		return
@@ -141,7 +141,7 @@ func clearSession(w http.ResponseWriter) {
 
 func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("User::Dishboard")
-	userName := getUserName(r)
+	userName := GetUserName(r)
 	if userName == nil {
 		http.Redirect(w, r, "/user/login/", 302)
 		return
@@ -158,7 +158,7 @@ func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func dashboardApp(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	userName := getUserName(r)
+	userName := GetUserName(r)
 	if userName == nil {
 		http.Redirect(w, r, "/user/login/", 302)
 		return
