@@ -17,7 +17,8 @@ type connection struct {
 	send chan msg
 
 	// The hub.
-	h *hub
+	h  *hub
+	wr *SocketRouter
 }
 
 func (c *connection) reader() {
@@ -25,12 +26,20 @@ func (c *connection) reader() {
 		message := msg{}
 		err := c.ws.ReadJSON(&message)
 		if err != nil {
-			fmt.Println("error", err)
+			fmt.Println("ReadJSON Error", err)
 			// TODO: write filed message?
 			break
 		}
-		fmt.Println("reader:", message)
-		c.h.broadcast <- message
+
+		//TODO: see if I can create some sort of router to route actions...
+		if !c.wr.Match(message){
+			fmt.Println("No action")
+		}
+		else {
+			fmt.Println("reader:", message)
+			c.h.broadcast <- message
+		}
+
 	}
 	c.ws.Close()
 }
@@ -40,6 +49,7 @@ func (c *connection) writer() {
 		//err := c.ws.WriteMessage(websocket.TextMessage, message)
 		err := c.ws.WriteJSON(message)
 		if err != nil {
+			fmt.Println("writerError:", err)
 			// TODO: write filed message?
 			break
 		}
@@ -51,7 +61,8 @@ func (c *connection) writer() {
 var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
 
 type wsHandler struct {
-	h *hub
+	h  *hub
+	wr *SocketRouter
 }
 
 type msg struct {
@@ -72,7 +83,7 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	c := &connection{send: make(chan msg, 256), ws: ws, h: wsh.h}
+	c := &connection{send: make(chan msg, 256), ws: ws, h: wsh.h, wr: wsh.wr}
 	c.h.register <- c
 	defer func() { c.h.unregister <- c }()
 	go c.writer()

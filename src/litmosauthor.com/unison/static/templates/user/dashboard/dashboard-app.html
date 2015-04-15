@@ -115,6 +115,10 @@ core-scaffold[mode=cover] .content {
         // websocket
         if (window["WebSocket"]) {
           try {
+            // TODO: make this file a go tempalte
+            // homeTempl.Execute(c, req.Host)
+            // conn = new WebSocket("ws://{{$}}/ws");
+            // 
             this.conn = new WebSocket("ws://localhost:8080/ws/");
             this.conn.onclose = function(event) {
               me.appendLog("<div><b>Connection closed.</b></div>")
