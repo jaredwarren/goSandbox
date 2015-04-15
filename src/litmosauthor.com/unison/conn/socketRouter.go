@@ -6,18 +6,7 @@ func NewStockRouter() *SocketRouter {
 }
 
 type SocketRouter struct {
-	// Configurable Handler to be used when no route matches.
-	//NotFoundHandler http.Handler
-	// Parent route, if this is a subrouter.
-	//parent parentRoute
-	// Routes to be matched, in order.
 	routes []*SocketRoute
-	// Routes by name for URL building.
-	//namedRoutes map[string]*SocketRoute
-	// See Router.StrictSlash(). This defines the flag for new routes.
-	//strictSlash bool
-	// If true, do not clear the request context after handling the request
-	//KeepContext bool
 }
 
 // NewRoute registers an empty route.

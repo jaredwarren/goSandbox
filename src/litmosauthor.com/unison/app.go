@@ -61,6 +61,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.Handle("/project/", project.MakeMuxer("/project/", alphaDB))
 	http.Handle("/user/", user.MakeMuxer("/user/", alphaDB))
+
 	// websocket
 	http.Handle("/ws/", conn.MakeMuxer("/ws/", alphaDB))
 

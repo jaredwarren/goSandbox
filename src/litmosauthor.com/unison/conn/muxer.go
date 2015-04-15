@@ -32,8 +32,6 @@ func MakeMuxer(prefix string, db *sql.DB) http.Handler {
 }
 
 // just here to test, should move somewhere else
-//
-
 func messageHandler(message msg) {
 	fmt.Println("Action:", message.Action, " Data:", message.Message)
 }

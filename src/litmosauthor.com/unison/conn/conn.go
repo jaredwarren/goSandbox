@@ -32,14 +32,12 @@ func (c *connection) reader() {
 		}
 
 		//TODO: see if I can create some sort of router to route actions...
-		if !c.wr.Match(message){
-			fmt.Println("No action")
-		}
-		else {
-			fmt.Println("reader:", message)
+		if !c.wr.Match(message) {
+			fmt.Println("No action:", message)
+		} else {
+			fmt.Println("<=", message)
 			c.h.broadcast <- message
 		}
-
 	}
 	c.ws.Close()
 }
@@ -53,7 +51,7 @@ func (c *connection) writer() {
 			// TODO: write filed message?
 			break
 		}
-		fmt.Println("writer:", message)
+		fmt.Println("=>", message)
 	}
 	c.ws.Close()
 }
@@ -89,9 +87,7 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	go c.writer()
 
 	// broadcast new user
-	m := msg{}
-	m.Message = "New User:" + userName.Username
-	m.Action = "message"
+	m := msg{Message: "New User:" + userName.Username, Action: "message"}
 	c.h.broadcast <- m
 
 	// blocking
