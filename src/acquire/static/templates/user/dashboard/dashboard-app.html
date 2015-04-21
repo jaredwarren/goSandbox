@@ -1,0 +1,311 @@
+{{define "dashboardApp"}}
+<!-- <link rel="import" href="/static/templates/user/user-login.html"> -->
+<link rel="import" href="/static/components/core-scaffold/core-scaffold.html">
+<link rel="import" href="/static/components/core-drawer-panel/core-drawer-panel.html">
+<link rel="import" href="/static/components/core-animated-pages/core-animated-pages.html">
+<link rel="import" href="/static/components/core-animated-pages/transitions/slide-up.html">
+<link rel="import" href="/static/components/core-animated-pages/transitions/scale-up.html">
+<link rel="import" href="/static/components/core-animated-pages/transitions/tile-cascade.html">
+<link rel="import" href="/static/components/core-menu/core-menu.html">
+<link rel="import" href="/static/components/core-header-panel/core-header-panel.html">
+<link rel="import" href="/static/components/core-menu/core-menu.html">
+<link rel="import" href="/static/components/core-item/core-item.html">
+<link rel="import" href="/static/components/paper-button/paper-button.html">
+<style type="text/css">
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+core-scaffold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.content {
+  background-color: #fff;
+  height: 5000px;
+  padding: 20px;
+}
+/* some default styles for mode="cover" on core-scaffold */
+
+core-scaffold[mode=cover]::shadow core-header-panel::shadow #mainContainer {
+  left: 120px;
+}
+
+core-scaffold[mode=cover] .content {
+  margin: 20px 100px 20px 0;
+}
+</style>
+<polymer-element name="dashboard-app" attributes="user categories" vertical layout>
+  <template>
+    <core-scaffold>
+      <core-header-panel navigation flex mode="seamed">
+        <core-toolbar style="background-color: #526E9C; color: #fff;">Application</core-toolbar>
+        <core-menu>
+          <core-item icon="settings" label="item1"></core-item>
+          <core-item icon="settings" label="Log Out" on-tap="{{logout}}"></core-item>
+        </core-menu>
+      </core-header-panel>
+      <div tool>Title</div>
+      <textarea id="message"></textarea>
+      <paper-button raised on-tap="{{onSubmit}}">Send</paper-button>
+      <div id="log"></div>
+    </core-scaffold>
+  </template>
+  <script>
+  (function() {
+    console.log("...");
+    window.setTopekaTransitionSpeed = function(ms) {
+      CoreStyle.g.transitions.duration = ms + 'ms';
+      CoreStyle.g.transitions.scaleDelay = CoreStyle.g.transitions.duration;
+    }
+
+    setTopekaTransitionSpeed(350);
+
+    Polymer('dashboard-app', {
+      selected: 'splash',
+      responsiveWidth: '900px',
+      connected: false,
+      minSplashTime: 1000,
+      disableLeaderboard: false,
+      observe: {
+        'user': 'startup'
+      },
+
+      ready: function() {
+        var me = this;
+        console.log("ready");
+        this.test = window.location.search.indexOf('test') >= 0;
+        this.offline = this.test || window.location.search.indexOf('offline') >= 0;
+
+        this.readyTime = Date.now();
+
+        var dummyState = {
+          app: 'topeka'
+        };
+        // set up history state
+        if (!history.state) {
+          history.pushState(dummyState, '');
+        }
+
+        // "back" button will show categories, unless in profile screen
+        window.onpopstate = function() {
+          console.log("window.onpopstate");
+          if (this.selected !== 'profile') {
+            this.showCategories();
+          }
+          // repopulate history state so we get the popstate event again
+          history.pushState(dummyState, '');
+        }.bind(this);
+
+        if (!this.user) {
+          this.startup();
+        }
+
+
+        // websocket
+        if (window["WebSocket"]) {
+          try {
+            // TODO: make this file a go tempalte
+            // homeTempl.Execute(c, req.Host)
+            // conn = new WebSocket("ws://{{$}}/ws");
+            // 
+            this.conn = new WebSocket("ws://localhost:8080/ws/");
+            this.conn.onclose = function(event) {
+              me.appendLog("<div><b>Connection closed.</b></div>")
+            }
+            this.conn.onmessage = function(event) {
+              me.processResponse(JSON.parse(event.data))
+            }
+            this.conn.onerror = function(event) {
+              console.log(event);
+              me.appendLog("ERROR:");
+            }
+          } catch (e) {
+            debugger;
+            me.appendLog("<div><b>Connection closed.</b></div>")
+          }
+        } else {
+          me.appendLog("<div><b>Your browser does not support WebSockets.</b></div>")
+        }
+
+
+      },
+
+
+
+
+
+      conn: null,
+
+      processResponse: function(response) {
+        console.log("processResponse:", response);
+        switch (response.Action) {
+          case "message":
+            this.appendLog(response.Message);
+            break;
+          default:
+            alert("Invalid Action:", response.Action);
+            break;
+        }
+      },
+
+      appendLog: function(responseString) {
+        this.$.log.appendChild(this.injectBoundHTML(responseString + "<br/>"));
+      },
+
+
+      onSubmit: function() {
+        if (!this.conn) {
+          return false;
+        }
+        var message = this.$.message.value;
+        if (!message) {
+          return false;
+        }
+        var messageJson = {
+          "Message": message,
+          "Action": "message"
+        };
+        this.conn.send(JSON.stringify(messageJson));
+        this.$.message.value = ''
+        return false
+      },
+
+
+
+
+
+
+
+
+      eventDelegates: {
+        'main': 'showCategories',
+        'score-update': 'computeScore'
+      },
+
+      showCategories: function() {
+        console.log("showCategories");
+        this.selected = 'categories';
+      },
+
+      showCategory: function() {
+        console.log("showCategory");
+        this.selected = 'category';
+      },
+
+      showLeaderboard: function() {
+        console.log("showLeaderboard");
+        this.selected = 'leaderboard';
+      },
+
+      showProfile: function() {
+        console.log("showProfile");
+        this.selected = 'profile';
+        this.$.profile.userDefaults = this.user;
+      },
+
+      logout: function() {
+        window.location = '/user/logout/';
+      },
+
+      categorySelect: function() {
+        console.log("categorySelect");
+        if (this.category) {
+          var n = this.category.name;
+          if (n === 'leaderboard') {
+            this.showLeaderboard();
+          } else if (n === 'profile') {
+            this.showProfile();
+          } else {
+            this.showCategory();
+          }
+        }
+      },
+
+      loadScores: function() {
+        console.log("loadScores");
+        var pts = 0;
+        try {
+          this.allScores = JSON.parse(localStorage.getItem('topeka-scores'));
+          if (!this.allScores) {
+            this.resetScores();
+          } else {
+            for (var n in this.allScores) {
+              pts += this.sumPts(this.allScores[n]);
+            }
+            this.user.score = pts;
+          }
+        } catch (e) {
+          this.resetScores();
+        }
+      },
+
+      computeScore: function() {
+        console.log("computeScore");
+        if (this.user) {
+          var pts = 0;
+          for (var n in this.allScores) {
+            pts += this.sumPts(this.allScores[n]);
+          }
+          this.user.score = pts;
+          localStorage.setItem('topeka-scores', JSON.stringify(this.allScores));
+        }
+      },
+
+      resetScores: function() {
+        console.log("resetScores");
+        localStorage.removeItem('topeka-scores');
+        if (this.user) {
+          this.user.score = 0;
+        }
+        this.allScores = {};
+      },
+
+      sumPts: function(s) {
+        console.log("sumPts");
+        var pts = 0;
+        for (var i = 0; i < s.length; i++) {
+          pts += (s[i] || 0);
+        }
+        return pts;
+      },
+
+      startup: function() {
+        console.log("startup");
+        var elapsed = Date.now() - this.readyTime;
+        var t = this.minSplashTime - elapsed;
+        this.async('completeStartup', null, t > 0 ? t : 0);
+      },
+
+      completeStartup: function() {
+        console.log("completeStartup");
+        if (this.user) {
+          this.loadScores();
+          this.selected = 'categories';
+        } else {
+          this.resetScores();
+          this.selected = 'profile';
+        }
+      },
+
+      transitionEndAction: function() {
+        console.log("transitionEndAction");
+        this.disableLeaderboard = (this.selected !== 'leaderboard');
+      }
+
+    });
+
+  })();
+  </script>
+</polymer-element>
+{{end}}

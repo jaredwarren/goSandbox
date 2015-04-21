@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"acquire/conn"
+	"acquire/game"
 	"acquire/ini"
 
 	/*"database/sql"
@@ -34,9 +36,10 @@ func main() {
 	r := router
 	//r.HandleFunc("/static/{path:.*}", common.StaticHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	r.HandleFunc("/products", ProductsHandler)
-	//http.Handle("/project/", project.MakeMuxer("/project/"))
-	//http.Handle("/user/", user.MakeMuxer("/user/", alphaDB))
+	http.Handle("/game/", game.MakeMuxer("/game/"))
+
+	// websocket
+	http.Handle("/ws/", conn.MakeMuxer("/ws/"))
 
 	// wait for clients
 	http.Handle("/", r)

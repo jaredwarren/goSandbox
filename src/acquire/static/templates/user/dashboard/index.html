@@ -1,0 +1,11 @@
+{{define "head"}}
+<meta name="application-name" content="Dashboard">
+<title>Dashboard</title>
+{{end}}
+
+{{define "body"}}
+<link rel="import" href="/static/templates/user/dashboard/dashboard-app.html">
+<template is="auto-binding">
+	<dashboard-app fit touch-action="auto"></dashboard-app>
+</template>
+{{end}}

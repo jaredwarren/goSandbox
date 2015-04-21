@@ -1,0 +1,20 @@
+{{define "head"}}<title>
+
+index</title>{{end}}
+
+
+{{define "body"}}index
+<p>{{.Content.Title}}</p>
+
+	{{template "content" .}}
+
+	
+{{end}}
+
+
+{{define "comment"}}
+<div>
+    {{.Note}}
+</div>
+
+{{end}}

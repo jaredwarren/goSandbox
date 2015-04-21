@@ -1,0 +1,29 @@
+{{define "base"}}
+<html>
+  	<head>
+  		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-touch-fullscreen" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style"
+		    content="black-translucent" >
+		<meta name="format-detection" content="telephone=no">
+
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="icon" sizes="196x196" href="icons/icon-196.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="icons/iPad@2x.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="icons/Icon-72@2x.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="icons/iPhone@2x.png">
+
+		<script src="/static/components/platform/platform.js"></script>
+
+		<link rel="stylesheet" href="/static/theme.css" shim-shadowdom>
+
+
+  		{{template "head" .}}
+  	</head>
+	<body unresolved>
+		{{template "body" .}}
+	</body>
+</html>
+{{end}}
