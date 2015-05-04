@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"pat",
+				"patchWidth	 ν"
+			],
+			[
+				"poo",
+				"poolImage	PoolImage ν"
+			],
+			[
+				"print",
+				"Printf	n int, err error ƒ"
+			],
+			[
+				"file",
+				"filetype	string ν"
+			],
+			[
 				"text",
 				"textarea	Tag"
 			],
@@ -18,10 +34,6 @@
 			[
 				"StatusTe",
 				"StatusText	string ƒ"
-			],
-			[
-				"print",
-				"Println	n int, err error ƒ"
 			],
 			[
 				"Fp",
@@ -166,10 +178,6 @@
 			[
 				"padd",
 				"padding"
-			],
-			[
-				"file",
-				"filePath"
 			],
 			[
 				"T",
@@ -506,107 +514,88 @@
 			[
 				"remove",
 				"removeCategory"
-			],
-			[
-				"nu",
-				"numberOfSlices"
-			],
-			[
-				"backgroun",
-				"background-color"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/acquire/conn/hub.go",
+			"file": "src/mosaic/app.go",
 			"settings":
 			{
-				"buffer_size": 1327,
+				"buffer_size": 6872,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "package conn\n\nimport (\n	\"fmt\"\n	//_ \"github.com/go-sql-driver/mysql\"\n\n	\"github.com/gorilla/websocket\"\n	\"litmosauthor.com/unison/user\"\n	\"net/http\"\n	\"acquire/game\"\n)\n\ntype connection struct {\n	// The websocket connection.\n	ws *websocket.Conn\n\n	// Buffered channel of outbound messages.\n	send chan Message\n\n	// The hub.\n	h  *hub\n	wr *SocketRouter\n}\n\nfunc (c *connection) reader() {\n	for {\n		message := Message{}\n		err := c.ws.ReadJSON(&message)\n		if err != nil {\n			fmt.Println(\"ReadJSON Error\", err)\n			// TODO: write filed message?\n			break\n		}\n\n		//TODO: see if I can create some sort of router to route actions...\n		if !c.wr.Match(message) {\n			fmt.Println(\"No action:\", message)\n		} else {\n			fmt.Println(\"<=\", message)\n			c.h.broadcast <- message\n		}\n	}\n	c.ws.Close()\n}\n\nfunc (c *connection) writer() {\n	for message := range c.send {\n		//err := c.ws.WriteMessage(websocket.TextMessage, message)\n		err := c.ws.WriteJSON(message)\n		if err != nil {\n			fmt.Println(\"writerError:\", err)\n			// TODO: write filed message?\n			break\n		}\n		fmt.Println(\"=>\", message)\n	}\n	c.ws.Close()\n}\n\nvar upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}\n\ntype wsHandler struct {\n	h  *hub\n}\n\nfunc (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {\n	// make sure session is valid\n	userName := user.GetUserName(r)\n	if userName == nil {\n		fmt.Println(\"No User\")\n		// TODO: throw error\n		return\n	}\n	// setup websocket\n	ws, err := upgrader.Upgrade(w, r, nil)\n	if err != nil {\n		return\n	}\n	// TODO: make player instead of connection\n	//c := &connection{send: make(chan Message, 256), ws: ws, h: wsh.h, wr: wsh.wr}\n	player := &Player{}\n	c.h.register <- c\n	defer func() { c.h.unregister <- c }()\n	go c.writer()\n\n	// broadcast new user\n	m := Message{Text: \"New User:\" + userName.Username, Action: \"message\"}\n	c.h.broadcast <- m\n\n	// blocking\n	c.reader()\n}\n",
-			"file": "src/acquire/conn/conn.go",
-			"file_size": 1938,
-			"file_write_time": 130737826102072984,
+			"file": "src/mosaic/ini/config.ini",
 			"settings":
 			{
-				"buffer_size": 1868,
+				"buffer_size": 50,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/game/player.go",
+			"file": "src/mosaic/static/templates/index.html",
 			"settings":
 			{
-				"buffer_size": 546,
+				"buffer_size": 305,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/conn/message.go",
+			"file": "src/mosaic/static/templates/base.html",
 			"settings":
 			{
-				"buffer_size": 289,
+				"buffer_size": 122,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/app.go",
+			"file": "src/mosaic/static/templates/uploadImage.html",
 			"settings":
 			{
-				"buffer_size": 960,
+				"buffer_size": 317,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/game/game.go",
+			"file": "src/mosaic/static/upload.html",
 			"settings":
 			{
-				"buffer_size": 625,
+				"buffer_size": 307,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/static/templates/user/dashboard/index.html",
+			"file": "src/litmosauthor.com/unison/app.go",
 			"settings":
 			{
-				"buffer_size": 306,
+				"buffer_size": 1489,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/litmosauthor.com/unison/user/user.go",
+			"settings":
+			{
+				"buffer_size": 4876,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/static/templates/game/base.html",
+			"file": "src/acquire/ini/config.go",
 			"settings":
 			{
-				"buffer_size": 128,
+				"buffer_size": 5595,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/conn/stockRoute.go",
+			"file": "src/acquire/static/templates/base.html",
 			"settings":
 			{
-				"buffer_size": 507,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/acquire/game/muxer.go",
-			"settings":
-			{
-				"buffer_size": 346,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/acquire/common/common.go",
-			"settings":
-			{
-				"buffer_size": 889,
+				"buffer_size": 159,
 				"line_ending": "Windows"
 			}
 		}
@@ -708,9 +697,6 @@
 	"expanded_folders":
 	[
 		"/C/data/www/go",
-		"/C/data/www/go/pkg/windows_amd64",
-		"/C/data/www/go/pkg/windows_amd64/github.com",
-		"/C/data/www/go/pkg/windows_amd64/github.com/gorilla",
 		"/C/data/www/go/src",
 		"/C/data/www/go/src/acquire",
 		"/C/data/www/go/src/acquire/common",
@@ -725,12 +711,29 @@
 		"/C/data/www/go/src/litmosauthor.com/unison/hello",
 		"/C/data/www/go/src/litmosauthor.com/unison/ini",
 		"/C/data/www/go/src/litmosauthor.com/unison/project",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates",
 		"/C/data/www/go/src/litmosauthor.com/unison/string",
-		"/C/data/www/go/src/litmosauthor.com/unison/user"
+		"/C/data/www/go/src/litmosauthor.com/unison/user",
+		"/C/data/www/go/src/mosaic",
+		"/C/data/www/go/src/mosaic/ini",
+		"/C/data/www/go/src/mosaic/static",
+		"/C/data/www/go/src/mosaic/static/templates"
 	],
 	"file_history":
 	[
+		"/C/data/www/go/src/mosaic/ini/config.go",
+		"/C/data/www/go/src/mosaic/static/templates/base.html",
+		"/C/data/www/go/src/mosaic/static/templates/base.thml.volt",
+		"/C/data/www/go/src/acquire/static/templates/user/index.html",
+		"/C/data/www/go/src/acquire/game/player.go",
+		"/C/data/www/go/src/acquire/conn/message.go",
+		"/C/data/www/go/src/acquire/app.go",
+		"/C/data/www/go/src/acquire/game/game.go",
+		"/C/data/www/go/src/acquire/static/templates/user/dashboard/index.html",
+		"/C/data/www/go/src/acquire/static/templates/game/base.html",
+		"/C/data/www/go/src/acquire/game/muxer.go",
+		"/C/data/www/go/src/acquire/common/common.go",
+		"/C/data/www/go/src/acquire/conn/hub.go",
+		"/C/data/www/go/src/acquire/conn/conn.go",
 		"/C/data/www/go/src/acquire/static/templates/game/newgame.html",
 		"/C/data/www/go/src/litmosauthor.com/unison/app.go",
 		"/C/data/www/go/src/litmosauthor.com/unison/user/user.go",
@@ -738,7 +741,6 @@
 		"/C/data/www/go/src/litmosauthor.com/unison/conn/hub.go",
 		"/C/data/www/go/src/litmosauthor.com/unison/conn/conn.go",
 		"/C/data/www/go/src/litmosauthor.com/unison/common/common.go",
-		"/C/data/www/go/src/acquire/conn/conn.go",
 		"/C/data/www/go/src/acquire/conn/muxer.go",
 		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/content.html",
 		"/C/data/www/go/src/acquire/static/templates/base.html",
@@ -759,7 +761,6 @@
 		"/C/data/www/go/src/litmosauthor.com/unison/project/project.go",
 		"/C/data/www/go/src/acquire/ini/config.ini",
 		"/C/Users/jaredwarren/Desktop/hosts",
-		"/C/data/www/go/src/acquire/app.go",
 		"/C/data/www/go/src/github.com/prep/ovr/ovr.go",
 		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/404.html",
 		"/C/data/www/go/src/acquire/static/index.html",
@@ -846,19 +847,7 @@
 		"/C/data/www/mlss2/4/scormdriver.js",
 		"/C/data/www/mlss2/app/controller/LoginController.js",
 		"/C/data/www/mlss2/resources/sass/ri/default/_helpoverlay.scss",
-		"/C/data/www/mlss2/build/Mlss/production/md5.js",
-		"/C/data/www/mlss2/app/controller/DownloadController.js",
-		"/C/data/www/mlss2/app/controller/ScormController.js",
-		"/C/data/www/mlss2/globals.js",
-		"/C/data/www/mlss2/resources/sass/ri/default/_coursitem.scss",
-		"/C/data/CourseFiles/Publish/Mobile/Scorm2004/scormdriver.js",
-		"/C/data/www/mlss2/resources/sass/app.scss",
-		"/C/data/www/mlss2/resources/sass/ri/default/_all.scss",
-		"/C/data/www/mlss2/touch/resources/themes/vendor/compass-recipes/stylesheets/recipes/background/_gradients.scss",
-		"/C/data/www/mlss2/build/Mlss/production/app.js",
-		"/C/data/www/mlss2/app.json",
-		"/C/data/www/mlss2/app/store/CourseStatuses.js",
-		"/C/data/www/mlss2/app/view/CategoryList.js"
+		"/C/data/www/mlss2/build/Mlss/production/md5.js"
 	],
 	"find":
 	{
@@ -903,6 +892,12 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"target_w",
+			"float32",
+			"patch_h",
+			"patch_w",
+			"target_aspect",
+			"config",
 			"msg",
 			"Cmd",
 			"msg",
@@ -1024,13 +1019,7 @@
 			"Mill",
 			"SCORM_db",
 			"setpassed",
-			"SetStatus",
-			"statusType",
-			"status",
-			"commands",
-			"ToMS",
-			"IsValidCMITimeSpan",
-			"IsValidIso8601TimeSpan"
+			"SetStatus"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1038,6 +1027,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"float64",
 			"GetUserName",
 			"user-login",
 			"login-app",
@@ -1109,30 +1099,58 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/acquire/conn/hub.go",
+					"file": "src/mosaic/app.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1327,
+						"buffer_size": 6872,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								505,
-								505
+								3450,
+								3450
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
 							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1638.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/mosaic/ini/config.ini",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 50,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								30,
+								40
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1142,90 +1160,25 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "src/acquire/conn/conn.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1868,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1061,
-								1061
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 234.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
 					"buffer": 2,
-					"file": "src/acquire/game/player.go",
+					"file": "src/mosaic/static/templates/index.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 546,
+						"buffer_size": 305,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								110,
-								110
+								305,
+								305
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/acquire/conn/message.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 289,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								289,
-								289
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/HTML/HTML.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1235,49 +1188,110 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "src/acquire/app.go",
+					"buffer": 3,
+					"file": "src/mosaic/static/templates/base.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 960,
+						"buffer_size": 122,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								566,
-								566
+								97,
+								97
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/HTML/HTML.tmLanguage"
 						},
-						"translation.x": -0.0,
-						"translation.y": 78.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "src/acquire/game/game.go",
+					"buffer": 4,
+					"file": "src/mosaic/static/templates/uploadImage.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 625,
+						"buffer_size": 317,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								66,
-								66
+								309,
+								73
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/mosaic/static/upload.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 307,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7,
+								34
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 6,
+					"file": "src/litmosauthor.com/unison/app.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1489,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								780,
+								780
 							]
 						],
 						"settings":
@@ -1286,27 +1300,85 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 78.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "src/acquire/static/templates/user/dashboard/index.html",
-					"semi_transient": false,
+					"buffer": 7,
+					"file": "src/litmosauthor.com/unison/user/user.go",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 306,
+						"buffer_size": 4876,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								306,
-								306
+								397,
+								397
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 156.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/acquire/ini/config.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5595,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4059,
+								4059
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 1854.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/acquire/static/templates/base.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 159,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								159,
+								0
 							]
 						],
 						"settings":
@@ -1318,121 +1390,6 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "src/acquire/static/templates/game/base.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 128,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								71,
-								71
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "src/acquire/conn/stockRoute.go",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 507,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								366,
-								366
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/acquire/game/muxer.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 346,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								346
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/acquire/common/common.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 889,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								384,
-								384
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
 					"type": "text"
 				}
 			]
@@ -1505,6 +1462,18 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"config.go",
+				"src\\acquire\\ini\\config.go"
+			],
+			[
+				"bas.thml",
+				"src\\acquire\\static\\templates\\base.html"
+			],
+			[
+				"user/index.html",
+				"src\\acquire\\static\\templates\\user\\index.html"
+			],
 			[
 				"common.go",
 				"src\\acquire\\common\\common.go"
@@ -2004,18 +1973,6 @@
 			[
 				"hoim",
 				"app\\page\\questions\\HOIMAGE.js"
-			],
-			[
-				"sench",
-				"touch\\sencha-touch-debug.js"
-			],
-			[
-				"pagec",
-				"app\\controller\\PageController.js"
-			],
-			[
-				"textinput",
-				"touch\\src\\field\\TextAreaInput.js"
 			]
 		],
 		"width": 0.0

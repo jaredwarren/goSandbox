@@ -128,6 +128,48 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "base", "")
 }
 
+type Pool struct {
+	Images        []PoolImage
+	AverageAspect float64
+}
+
+func (p Pool) ComputeMse() (float64, error) {
+	return 5.0, nil
+}
+
+func MakePool(path string) *Pool {
+	dir_to_scan := "C:/tmp/uploadedfile/pool"
+	files, _ := ioutil.ReadDir(dir_to_scan)
+	pool := make([]PoolImage, len(files))
+	total_aspect := float64(0)
+	counter := float64(0)
+	for key, imgFile := range files {
+		if reader, err := os.Open(filepath.Join(dir_to_scan, imgFile.Name())); err == nil {
+			defer reader.Close()
+			imageData, imageType, err := image.Decode(reader)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s: %v\n", imgFile.Name(), err)
+				continue
+			}
+			if imageType == "png" {
+
+			}
+			// TODO: resize to fit patch size
+			bounds := imageData.Bounds()
+			aspect := float64(bounds.Max.Y) / float64(bounds.Max.X)
+			total_aspect += aspect
+			counter++
+			pool[key] = PoolImage{Name: imgFile.Name(), Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
+		} else {
+			fmt.Println("Impossible to open the file:", err)
+		}
+	}
+	if err != nil {
+		panic(err)
+	}
+	return &Pool{Images: pool, AverageAspect: total_aspect / counter}
+}
+
 // TODO: make a array of pool image with aspect ratio
 //  	FIX config.ini make it my code
 //
@@ -147,31 +189,13 @@ func main() {
 	}
 
 	// POOL Images
-	dir_to_scan := "C:/tmp/uploadedfile/pool"
-	files, _ := ioutil.ReadDir(dir_to_scan)
-	pool := make([]PoolImage, len(files))
-	thumb_aspect := float64(0)
-	for key, imgFile := range files {
-		if reader, err := os.Open(filepath.Join(dir_to_scan, imgFile.Name())); err == nil {
-			defer reader.Close()
-			imageData, imageType, err := image.Decode(reader)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s: %v\n", imgFile.Name(), err)
-				continue
-			}
-			if imageType == "png" {
+	/*
 
-			}
-			bounds := imageData.Bounds()
-			aspect := float64(bounds.Max.Y) / float64(bounds.Max.X)
-			thumb_aspect += aspect
-			pool[key] = PoolImage{Name: imgFile.Name(), Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
-		} else {
-			fmt.Println("Impossible to open the file:", err)
-		}
-	}
+	*/
+	pool := MakePool("C:/tmp/uploadedfile/pool")
+	//fmt.Println(pool)
 
-	thumb_aspect = thumb_aspect / float64(len(pool))
+	//thumb_aspect = thumb_aspect / float64(len(pool))
 
 	// TARGET Image
 	if reader, err := os.Open("C:/tmp/uploadedfile/HTML5_Logo_512.png"); err == nil {
@@ -188,29 +212,43 @@ func main() {
 		// size
 		//thumb_aspect = sum(game.aspect for game in games) / len(games)
 		//patchHeight = int(float(patch_w) * thumb_aspect)
+		// TODO: patch size should be divisible by target width; aka round number of patches for row/column
+		//       should patch size be nearest square root of image size?
+		// TODO: resize target to match patch sizes also maintain aspect ratio
 		patchWidth, found := config.GetInt("options", "patchwidth")
 		if !found {
 			log.Fatal("Couldn't get patchWidth")
 		}
-		patchHeight := int(float64(patchWidth) * thumb_aspect)
+		// make same for now...
+		patchHeight := int(float64(patchWidth) * pool.AverageAspect)
+		//patchHeight := int(float64(patchWidth) * thumb_aspect)
 
 		target_aspect := bounds.Max.Y / bounds.Max.X
 
-		fmt.Println(patchWidth, patchHeight, target_aspect)
+		//fmt.Println(reflect.TypeOf(bounds.Max.Y))
+		//fmt.Println(patchWidth, patchHeight)
+		//y_patches := float64(bounds.Max.Y) / float64(patchHeight)
+		//x_patches := float64(bounds.Max.X) / float64(patchWidth)
+		//x_patches := bounds.Max.X / patchWidth
+
+		//fmt.Println(x_patches, y_patches)
 		cols, rows := 1, 1
-		for cols*rows < len(pool) {
-			col_asp := float64((cols+1)*patchWidth) / (math.Ceil(float64(len(pool))/float64(cols+1)) * float64(patchHeight))
-			row_asp := float64(cols*patchWidth) / (math.Ceil(float64(len(pool))/float64(cols)) * float64(patchHeight))
+		poolLen := len(pool.Images)
+		for cols*rows < poolLen {
+			col_asp := float64((cols+1)*patchWidth) / (math.Ceil(float64(poolLen)/float64(cols+1)) * float64(patchHeight))
+			row_asp := float64(cols*patchWidth) / (math.Ceil(float64(poolLen)/float64(cols)) * float64(patchHeight))
 			if math.Abs(col_asp-float64(target_aspect)) < math.Abs(row_asp-float64(target_aspect)) {
-				cols += 1
+				cols++
 			} else {
-				rows += 1
+				rows++
 			}
 		}
 		fmt.Println(cols, rows)
 		target_w := cols * patchWidth
 		target_h := rows * patchHeight
 		fmt.Println(bounds.Max.Y, bounds.Max.X, target_w, target_h)
+		/*
+		 */
 
 		/*var histogram [16][4]int
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
