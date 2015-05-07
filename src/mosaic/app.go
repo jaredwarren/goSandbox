@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"image"
+	"image/color"
 	//_ "image/jpeg"
 	"image/png"
 	"io"
@@ -11,7 +12,9 @@ import (
 	//"math"
 	"log"
 	"math"
+	"mosaic/imageutil"
 	"mosaic/ini"
+	"mosaic/search"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -170,6 +173,10 @@ func MakePool(path string) *Pool {
 	return &Pool{Images: pool, AverageAspect: total_aspect / counter}
 }
 
+func Round(f float64) float64 {
+	return math.Floor(f + .5)
+}
+
 // TODO: make a array of pool image with aspect ratio
 //  	FIX config.ini make it my code
 //
@@ -183,6 +190,19 @@ type PoolImage struct {
 }
 
 func main() {
+	model := search.NewModel()
+	// For testing only, this is not advisable on production
+	model.SetThreshold(1)
+
+	// This expands the distance searched, but costs more resources (memory and time).
+	// For spell checking, "2" is typically enough, for query suggestions this can be higher
+	model.SetDepth(5)
+
+	//words := []string{"DAEBAC", "4B74E6"}
+	//model.Train(words)
+	//fmt.Println("   Deletion test (yor) : ", model.SpellCheck("yor"))
+	//return
+
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config")
@@ -193,21 +213,26 @@ func main() {
 
 	*/
 	pool := MakePool("C:/tmp/uploadedfile/pool")
+
+	return
 	//fmt.Println(pool)
 
 	//thumb_aspect = thumb_aspect / float64(len(pool))
 
 	// TARGET Image
 	if reader, err := os.Open("C:/tmp/uploadedfile/HTML5_Logo_512.png"); err == nil {
-		img, _, err := image.Decode(reader)
+		targetImg, _, err := image.Decode(reader)
 		if err != nil {
 			fmt.Println("err", err)
 			return
 		}
-		fmt.Println(reflect.TypeOf(img))
-		//fmt.Printf("%d %d\n", img.Width, img.Height)
-		bounds := img.Bounds()
-		fmt.Println(bounds)
+		fmt.Println(reflect.TypeOf(targetImg))
+		//fmt.Printf("%d %d\n", targetImg.Width, targetImg.Height)
+		bounds := targetImg.Bounds()
+		targetWidth := float64(bounds.Max.X)
+		targetHeight := float64(bounds.Max.Y)
+		target_aspect := bounds.Max.Y / bounds.Max.X
+		//fmt.Println("Bounds:", bounds)
 
 		// size
 		//thumb_aspect = sum(game.aspect for game in games) / len(games)
@@ -219,19 +244,82 @@ func main() {
 		if !found {
 			log.Fatal("Couldn't get patchWidth")
 		}
-		// make same for now...
+		// patchHeight based on average of pool
 		patchHeight := int(float64(patchWidth) * pool.AverageAspect)
-		//patchHeight := int(float64(patchWidth) * thumb_aspect)
 
-		target_aspect := bounds.Max.Y / bounds.Max.X
+		xPatches := int(Round(targetWidth / float64(patchWidth)))
+		yPatches := int(Round(targetHeight / float64(patchHeight)))
+
+		patchWidth = 2
+		patchHeight = 2
+		fmt.Println("Patch:", patchWidth, patchHeight)
+
+		// adjust target
+		adjustedTarget := imageutil.Resize(targetImg, xPatches*patchWidth, yPatches*patchWidth, imageutil.Lanczos)
+
+		// test patches
+		colorList := make([]color.Color, patchWidth*patchHeight)
+		cwId := ""
+		for x := 0; x < patchWidth; x++ {
+			for y := 0; y < patchHeight; y++ {
+				rgbaPix := adjustedTarget.At(x, y)
+				hexx := search.ColorToHex(rgbaPix)
+				cwId += string(hexx)
+				colorList = append(colorList, hexx)
+			}
+		}
+		cw := search.ColorWord{Id: cwId, Colors: colorList}
+		model.TrainWord(cw)
+
+		//fmt.Println(cw)
+
+		//rgbaPix := adjustedTarget.At(100, 100)
+		//r, g, b, _ := rgbaPix.RGBA()
+		//fmt.Println(rgbaPix.RGBA())
+		//y, cb, cr := color.RGBToYCbCr(uint8(r>>8), uint8(g>>8), uint8(b>>8))
+		// TODO: store each of these, with target alpha?
+		// YCbCr{y, u, v}
+		//
+		//fmt.Println(y, cb, cr)
+
+		// test output
+		/*out, err := os.Create("C:/tmp/uploadedfile/HTML5_Logo_512___OUT.png")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		err = png.Encode(out, adjustedTarget)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}*/
+
+		// for each patch
+		// 		resize to match patch
+		//      foreach row
+		// 			foreach col
+		// 				append to list/word
+		//
+		//
+		// foreach patch in target
+		//      foreach row
+		// 			foreach col
+		// 				append to list/word
+
+		// ??? Can I change this so i resize the target, but not the patches/pool images?
+
+		return
+
+		// TODO: resize target to xPaches
 
 		//fmt.Println(reflect.TypeOf(bounds.Max.Y))
 		//fmt.Println(patchWidth, patchHeight)
 		//y_patches := float64(bounds.Max.Y) / float64(patchHeight)
 		//x_patches := float64(bounds.Max.X) / float64(patchWidth)
+		//fmt.Println(x_patches, y_patches)
+
 		//x_patches := bounds.Max.X / patchWidth
 
-		//fmt.Println(x_patches, y_patches)
 		cols, rows := 1, 1
 		poolLen := len(pool.Images)
 		for cols*rows < poolLen {
