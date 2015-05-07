@@ -190,29 +190,13 @@ type PoolImage struct {
 }
 
 func main() {
-	model := search.NewModel()
-	// For testing only, this is not advisable on production
-	model.SetThreshold(1)
-
-	// This expands the distance searched, but costs more resources (memory and time).
-	// For spell checking, "2" is typically enough, for query suggestions this can be higher
-	model.SetDepth(5)
-
-	//words := []string{"DAEBAC", "4B74E6"}
-	//model.Train(words)
-	//fmt.Println("   Deletion test (yor) : ", model.SpellCheck("yor"))
-	//return
-
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config")
 	}
 
 	// POOL Images
-	/*
-
-	*/
-	pool := MakePool("C:/tmp/uploadedfile/pool")
+	//pool := MakePool("C:/tmp/uploadedfile/pool")
 
 	return
 	//fmt.Println(pool)
