@@ -12,9 +12,9 @@ import (
 	//"math"
 	"log"
 	"math"
+	"mosaic/colordiff"
 	"mosaic/imageutil"
 	"mosaic/ini"
-	"mosaic/search"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -137,13 +137,18 @@ type Pool struct {
 }
 
 func (p Pool) ComputeMse() (float64, error) {
+
 	return 5.0, nil
 }
 
 func MakePool(path string) *Pool {
 	dir_to_scan := "C:/tmp/uploadedfile/pool"
 	files, _ := ioutil.ReadDir(dir_to_scan)
-	pool := make([]PoolImage, len(files))
+
+	MaxImage := 1
+
+	//pool := make([]PoolImage, len(files))
+	pool := make([]PoolImage, MaxImage)
 	total_aspect := float64(0)
 	counter := float64(0)
 	for key, imgFile := range files {
@@ -163,6 +168,9 @@ func MakePool(path string) *Pool {
 			total_aspect += aspect
 			counter++
 			pool[key] = PoolImage{Name: imgFile.Name(), Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
+			if counter >= float64(MaxImage) {
+				break
+			}
 		} else {
 			fmt.Println("Impossible to open the file:", err)
 		}
@@ -189,19 +197,23 @@ type PoolImage struct {
 	Image  image.Image
 }
 
+func (img *PoolImage) Resize(w, h int) {
+	img.Image = imageutil.Resize(img.Image, w, h, imageutil.Lanczos)
+	img.Width = w
+	img.Height = h
+}
+
 func main() {
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config")
 	}
 
+	// search model
+	//model := search.NewModel()
+
 	// POOL Images
-	//pool := MakePool("C:/tmp/uploadedfile/pool")
-
-	return
-	//fmt.Println(pool)
-
-	//thumb_aspect = thumb_aspect / float64(len(pool))
+	pool := MakePool("C:/tmp/uploadedfile/pool")
 
 	// TARGET Image
 	if reader, err := os.Open("C:/tmp/uploadedfile/HTML5_Logo_512.png"); err == nil {
@@ -215,8 +227,8 @@ func main() {
 		bounds := targetImg.Bounds()
 		targetWidth := float64(bounds.Max.X)
 		targetHeight := float64(bounds.Max.Y)
-		target_aspect := bounds.Max.Y / bounds.Max.X
-		//fmt.Println("Bounds:", bounds)
+		target_aspect := targetWidth / targetHeight
+		fmt.Println("target_aspect:", target_aspect)
 
 		// size
 		//thumb_aspect = sum(game.aspect for game in games) / len(games)
@@ -224,59 +236,84 @@ func main() {
 		// TODO: patch size should be divisible by target width; aka round number of patches for row/column
 		//       should patch size be nearest square root of image size?
 		// TODO: resize target to match patch sizes also maintain aspect ratio
-		patchWidth, found := config.GetInt("options", "patchwidth")
+		pw, found := config.GetInt("options", "patchwidth")
 		if !found {
 			log.Fatal("Couldn't get patchWidth")
 		}
+		patchWidth := float64(pw)
 		// patchHeight based on average of pool
-		patchHeight := int(float64(patchWidth) * pool.AverageAspect)
-
-		xPatches := int(Round(targetWidth / float64(patchWidth)))
-		yPatches := int(Round(targetHeight / float64(patchHeight)))
-
-		patchWidth = 2
-		patchHeight = 2
+		patchHeight := float64(patchWidth) * pool.AverageAspect
 		fmt.Println("Patch:", patchWidth, patchHeight)
 
-		// adjust target
-		adjustedTarget := imageutil.Resize(targetImg, xPatches*patchWidth, yPatches*patchWidth, imageutil.Lanczos)
+		target := targetImg.At(200, 200)
+		fmt.Println("target:", target)
+		palette := make([]color.Color, 10)
+		for i := 0; i < 10; i++ {
+			palette[i] = targetImg.At(i+100, i+100)
+		}
+		fmt.Println(palette)
+		x := colordiff.Closest(target, palette)
+		fmt.Println("Closest:", x)
 
-		// test patches
-		colorList := make([]color.Color, patchWidth*patchHeight)
-		cwId := ""
-		for x := 0; x < patchWidth; x++ {
-			for y := 0; y < patchHeight; y++ {
-				rgbaPix := adjustedTarget.At(x, y)
-				hexx := search.ColorToHex(rgbaPix)
-				cwId += string(hexx)
-				colorList = append(colorList, hexx)
+		/*for _, poolImage := range pool.Images {
+			poolImage.Resize(int(patchWidth), int(patchHeight))
+			colorWord := search.WordFromImage(poolImage.Image)
+			model.TrainWord(colorWord)
+		}*/
+
+		/*cols, rows := 1.0, 1.0
+		poolLen := float64(len(pool.Images))
+		for cols*rows < poolLen {
+			col_asp := (cols + 1) * patchWidth / (math.Ceil(poolLen/cols+1) * patchHeight)
+			row_asp := cols * patchWidth / (math.Ceil(poolLen/cols) * patchHeight)
+			if math.Abs(col_asp-target_aspect) < math.Abs(row_asp-target_aspect) {
+				cols++
+			} else {
+				rows++
 			}
 		}
-		cw := search.ColorWord{Id: cwId, Colors: colorList}
-		model.TrainWord(cw)
+		newTargetW := int(cols * patchWidth)
+		newTargetH := int(rows * patchHeight)
+
+		// adjust target
+		adjustedTarget := imageutil.Resize(targetImg, newTargetW, newTargetH, imageutil.Lanczos)
+		targetData := make([]color.Color, newTargetW*newTargetH)
+		for y := 0.0; y < rows; y++ {
+			yOfset := y * patchHeight
+			for x := 0.0; x < cols; x++ {
+				xOfset := x * patchHeight
+				for yy := 0.0; yy < patchHeight; yy++ {
+					for xx := 0.0; xx < patchWidth; xx++ {
+						rgbaPix := adjustedTarget.At(int(xOfset+xx), int(yOfset+yy))
+						targetData = append(targetData, rgbaPix)
+					}
+				}
+
+			}
+		}*/
+		// pool MSE
+		//pool.ComputeMse()
+
+		// test stuff
+
+		// test color
+
+		/*
+			// test output
+			out, err := os.Create("C:/tmp/uploadedfile/HTML5_Logo_512___OUT.png")
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			err = png.Encode(out, adjustedTarget)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		*/
+		return
 
 		//fmt.Println(cw)
-
-		//rgbaPix := adjustedTarget.At(100, 100)
-		//r, g, b, _ := rgbaPix.RGBA()
-		//fmt.Println(rgbaPix.RGBA())
-		//y, cb, cr := color.RGBToYCbCr(uint8(r>>8), uint8(g>>8), uint8(b>>8))
-		// TODO: store each of these, with target alpha?
-		// YCbCr{y, u, v}
-		//
-		//fmt.Println(y, cb, cr)
-
-		// test output
-		/*out, err := os.Create("C:/tmp/uploadedfile/HTML5_Logo_512___OUT.png")
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		err = png.Encode(out, adjustedTarget)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}*/
 
 		// for each patch
 		// 		resize to match patch
@@ -304,21 +341,6 @@ func main() {
 
 		//x_patches := bounds.Max.X / patchWidth
 
-		cols, rows := 1, 1
-		poolLen := len(pool.Images)
-		for cols*rows < poolLen {
-			col_asp := float64((cols+1)*patchWidth) / (math.Ceil(float64(poolLen)/float64(cols+1)) * float64(patchHeight))
-			row_asp := float64(cols*patchWidth) / (math.Ceil(float64(poolLen)/float64(cols)) * float64(patchHeight))
-			if math.Abs(col_asp-float64(target_aspect)) < math.Abs(row_asp-float64(target_aspect)) {
-				cols++
-			} else {
-				rows++
-			}
-		}
-		fmt.Println(cols, rows)
-		target_w := cols * patchWidth
-		target_h := rows * patchHeight
-		fmt.Println(bounds.Max.Y, bounds.Max.X, target_w, target_h)
 		/*
 		 */
 

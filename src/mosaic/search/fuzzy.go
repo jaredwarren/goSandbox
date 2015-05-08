@@ -4,6 +4,7 @@ import (
 	"bufio"
 	//"errors"
 	"fmt"
+	"image"
 	"image/color"
 	"index/suffixarray"
 	"os"
@@ -29,10 +30,6 @@ func (cw *ColorWord) Equals(hit ColorWord) bool {
 	return true
 }
 
-func MakeColorWordFromImage() {
-
-}
-
 type Potential struct {
 	Term   ColorWord
 	Score  int
@@ -41,7 +38,7 @@ type Potential struct {
 }
 
 type Model struct {
-	Data            map[string]ColorWord   `json:"data"`
+	Data            []ColorWord            `json:"data"`
 	Maxcount        int                    `json:"maxcount"`
 	Suggest         map[string][]ColorWord `json:"suggest"`
 	Depth           int                    `json:"depth"`
@@ -70,7 +67,7 @@ func NewModel() *Model {
 }
 
 func (model *Model) Init() *Model {
-	model.Data = make(map[string]ColorWord)
+	model.Data = make([]ColorWord, 100)
 	model.Suggest = make(map[string][]ColorWord)
 	model.Depth = 2
 	model.Threshold = 3          // Setting this to 1 is most accurate, but "1" is 5x more memory and 30x slower processing than "4". This is a big performance tuning knob
@@ -92,6 +89,23 @@ func (model *Model) SetThreshold(val int) {
 	model.Lock()
 	model.Threshold = val
 	model.Unlock()
+}
+
+func WordFromImage(img image.Image) ColorWord {
+	bounds := img.Bounds()
+	width := bounds.Max.Y
+	height := bounds.Max.X
+	colorData := make([]color.Color, width*height)
+	counter := 0
+	for y := 0; y < width; y++ {
+		for x := 0; x < height; x++ {
+			rgbaPix := img.At(x, y)
+			colorData[counter] = rgbaPix
+			counter++
+		}
+	}
+
+	return ColorWord{Colors: colorData}
 }
 
 // Calculate the Levenshtein distance between two strings
@@ -141,23 +155,8 @@ func (model *Model) Train(terms []ColorWord) {
 // Train the model word by word
 func (model *Model) TrainWord(term ColorWord) {
 	model.Lock()
-	currentTerm, ok := model.Data[term.Id]
-	if ok {
-		currentTerm.Score++
-	} else {
-		term.Score = 0
-		model.Data[term.Id] = term
-		currentTerm = term
-	}
-	// Set the max
-	if currentTerm.Score > model.Maxcount {
-		model.Maxcount = currentTerm.Score
-		model.SuffDivergence++
-	}
-	// If threshold is triggered, store delete suggestion keys
-	if currentTerm.Score == model.Threshold {
-		model.createSuggestKeys(term)
-	}
+	model.Data = append(model.Data, term)
+	//model.createSuggestKeys(term)
 	model.Unlock()
 }
 
@@ -189,6 +188,7 @@ func (model *Model) EditsMulti(term ColorWord, depth int) []ColorWord {
 		}
 		for _, edit := range edits {
 			edits2 := Edits1(edit)
+			fmt.Println(len(edits), len(edits2))
 			for _, edit2 := range edits2 {
 				edits = append(edits, edit2)
 			}
@@ -199,29 +199,27 @@ func (model *Model) EditsMulti(term ColorWord, depth int) []ColorWord {
 
 // Edits1 creates a set of terms that are 1 char delete from the input term
 func Edits1(word ColorWord) []ColorWord {
-
-	splits := []Pair{}
-	for i := 0; i <= len(word.Colors); i++ {
-		splits = append(splits, Pair{ColorWord{Colors: word.Colors[:i]}, ColorWord{Colors: word.Colors[i:]}})
+	splits := make([]Pair, len(word.Colors))
+	for i := 0; i < len(word.Colors); i++ {
+		splits[i] = Pair{ColorWord{Colors: word.Colors[:i]}, ColorWord{Colors: word.Colors[i:]}}
 	}
 
 	total_set := []ColorWord{}
 	for _, elem := range splits {
 		//deletion
 		if len(elem.str2.Colors) > 0 {
-			total_set = append(total_set, ColorWord{Colors: elem.str1.Colors}, ColorWord{Colors: elem.str2.Colors[1:]})
+			total_set = append(total_set, ColorWord{Colors: append(elem.str1.Colors, elem.str2.Colors[1:]...)})
 		} else {
 			total_set = append(total_set, ColorWord{Colors: elem.str1.Colors})
 		}
-
 	}
 	return total_set
 }
 
 func (model *Model) score(input ColorWord) int {
-	if word, ok := model.Data[input.Id]; ok {
+	/*if word, ok := model.Data; ok {
 		return word.Score
-	}
+	}*/
 	return 0
 }
 
