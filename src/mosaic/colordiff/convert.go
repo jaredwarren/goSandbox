@@ -25,6 +25,7 @@ const RefX = 95.047
 const RefY = 100.000
 const RefZ = 108.883
 
+// http://www.easyrgb.com/index.php?X=MATH&H=02#text2
 func RgbToXyz(c color.Color) XYZ {
 	R, G, B, _ := c.RGBA()
 	r := float64(uint8(R>>8)) / 255
@@ -56,12 +57,13 @@ func RgbToXyz(c color.Color) XYZ {
 	return XYZ{X: x, Y: y, Z: z}
 }
 
+// http://www.easyrgb.com/index.php?X=MATH&H=07#text7
 func XyzToLab(c XYZ) LAB {
 	x := c.X / RefX
 	y := c.Y / RefY
 	z := c.Z / RefZ
 	if x > 0.008856 {
-		x = math.Pow(x, 0.333333)
+		x = math.Pow(x, 1/3)
 	} else {
 		x = (7.787 * x) + (16 / 116)
 	}

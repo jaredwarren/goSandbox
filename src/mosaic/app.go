@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"image"
 	"image/color"
+	"image/draw"
 	//_ "image/jpeg"
 	"image/png"
 	"io"
@@ -132,7 +133,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type Pool struct {
-	Images        []PoolImage
+	Images        []*PoolImage
 	AverageAspect float64
 }
 
@@ -145,10 +146,14 @@ func MakePool(path string) *Pool {
 	dir_to_scan := "C:/tmp/uploadedfile/pool"
 	files, _ := ioutil.ReadDir(dir_to_scan)
 
-	MaxImage := 1
+	MaxImage := 100
+	/*
+		MaxImage := len(files)
+
+	*/
 
 	//pool := make([]PoolImage, len(files))
-	pool := make([]PoolImage, MaxImage)
+	pool := make([]*PoolImage, MaxImage)
 	total_aspect := float64(0)
 	counter := float64(0)
 	for key, imgFile := range files {
@@ -167,7 +172,7 @@ func MakePool(path string) *Pool {
 			aspect := float64(bounds.Max.Y) / float64(bounds.Max.X)
 			total_aspect += aspect
 			counter++
-			pool[key] = PoolImage{Name: imgFile.Name(), Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
+			pool[key] = &PoolImage{Name: imgFile.Name(), Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
 			if counter >= float64(MaxImage) {
 				break
 			}
@@ -189,12 +194,20 @@ func Round(f float64) float64 {
 //  	FIX config.ini make it my code
 //
 //
+/*type Patch struct {
+	X  int
+	Y int
+	Image  image.Image
+}*/
+//
+
 type PoolImage struct {
 	Name   string
 	Width  int
 	Height int
 	Aspect float64
 	Image  image.Image
+	Deltas []float64
 }
 
 func (img *PoolImage) Resize(w, h int) {
@@ -203,14 +216,48 @@ func (img *PoolImage) Resize(w, h int) {
 	img.Height = h
 }
 
+// Calculate average error for each patch
+func (img *PoolImage) CalculateError(patches [][]color.Color) {
+	img.Deltas = make([]float64, len(patches))
+	for patchIndex, targetPatch := range patches {
+		if len(targetPatch) != img.Width*img.Height {
+			fmt.Println("ERROR:", len(targetPatch), "!=", img.Width*img.Height)
+		}
+
+		totalDiff := 0.0
+		yIndex := 0
+		xIndex := 0
+		width := float64(img.Width)
+		for pixelIndex, targetColor := range targetPatch {
+			yIndex = int(math.Floor(float64(pixelIndex) / width))
+			xIndex = pixelIndex - (yIndex * img.Width)
+			totalDiff += colordiff.Diff(targetColor, img.Image.At(xIndex, yIndex))
+		}
+
+		img.Deltas[patchIndex] = totalDiff / float64(len(targetPatch))
+	}
+	// TODO: sort err??
+	//fmt.Println(len(img.Deltas))
+
+}
+
+/*func (img *PoolImage) GetLowestError() (float64, int) {
+	lowestError := math.MaxFloat64
+	errorIndex := 0
+	for index, currentError := range img.Error {
+		if currentError < lowestError {
+			lowestError = currentError
+			errorIndex = index
+		}
+	}
+	return lowestError, errorIndex
+}*/
+
 func main() {
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config")
 	}
-
-	// search model
-	//model := search.NewModel()
 
 	// POOL Images
 	pool := MakePool("C:/tmp/uploadedfile/pool")
@@ -222,13 +269,10 @@ func main() {
 			fmt.Println("err", err)
 			return
 		}
-		fmt.Println(reflect.TypeOf(targetImg))
-		//fmt.Printf("%d %d\n", targetImg.Width, targetImg.Height)
 		bounds := targetImg.Bounds()
 		targetWidth := float64(bounds.Max.X)
 		targetHeight := float64(bounds.Max.Y)
-		target_aspect := targetWidth / targetHeight
-		fmt.Println("target_aspect:", target_aspect)
+		//target_aspect := targetWidth / targetHeight
 
 		// size
 		//thumb_aspect = sum(game.aspect for game in games) / len(games)
@@ -245,15 +289,91 @@ func main() {
 		patchHeight := float64(patchWidth) * pool.AverageAspect
 		fmt.Println("Patch:", patchWidth, patchHeight)
 
-		target := targetImg.At(200, 200)
-		fmt.Println("target:", target)
-		palette := make([]color.Color, 10)
-		for i := 0; i < 10; i++ {
-			palette[i] = targetImg.At(i+100, i+100)
+		// adjust target
+		/*cols, rows := 1.0, 1.0
+		poolLen := float64(len(pool.Images))
+		fmt.Println("Pool:", poolLen)
+		for cols*rows < poolLen {
+			col_asp := (cols + 1) * patchWidth / (math.Ceil(poolLen/(cols+1)) * patchHeight)
+			row_asp := cols * patchWidth / (math.Ceil(poolLen/cols) * patchHeight)
+			if math.Abs(col_asp-target_aspect) < math.Abs(row_asp-target_aspect) {
+				cols++
+			} else {
+				rows++
+			}
+		}*/
+		cols := 50.0
+		rows := 50.0
+		fmt.Println("cols:", cols, "rows:", rows)
+		newTargetW := int(cols * patchWidth)
+		newTargetH := int(rows * patchHeight)
+		adjustedTarget := imageutil.Resize(targetImg, newTargetW, newTargetH, imageutil.Lanczos)
+		fmt.Println(reflect.TypeOf(adjustedTarget), newTargetW, newTargetH)
+
+		targetPatches := [][]color.Color{}
+		for y := 0; y < int(rows); y++ {
+			for x := 0; x < int(cols); x++ {
+				targetPatches = append(targetPatches, getPatchData(adjustedTarget, x, y, int(patchWidth), int(patchHeight)))
+			}
 		}
-		fmt.Println(palette)
-		x := colordiff.Closest(target, palette)
-		fmt.Println("Closest:", x)
+
+		// calculate diff
+		// TODO: move this inside previous for loop?
+		for _, poolImage := range pool.Images {
+			poolImage.Resize(int(patchWidth), int(patchHeight))
+			poolImage.CalculateError(targetPatches)
+		}
+
+		// Position pool
+		imagePools := make([]*PoolImage, int(cols*rows))
+		yIndex := 0
+		xIndex := 0
+
+		//m := image.NewRGBA(image.Rect(0, 0, newTargetW, newTargetH))
+		for i, _ := range targetPatches {
+			var bestPoolImage *PoolImage
+			lowestError := math.MaxFloat64
+			for _, poolImage := range pool.Images {
+				if poolImage.Deltas[i] < lowestError {
+					bestPoolImage = poolImage
+					lowestError = poolImage.Deltas[i]
+				}
+			}
+			yIndex = int(math.Floor(float64(i) / cols))
+			xIndex = i - (yIndex * int(cols))
+			p := image.Pt(-xIndex*int(patchWidth), -yIndex*int(patchHeight))
+			draw.Draw(adjustedTarget, adjustedTarget.Bounds(), bestPoolImage.Image, p, draw.Src)
+			imagePools[i] = bestPoolImage
+		}
+		//fmt.Println(imagePools)
+
+		/*for y := 0; y < int(rows); y++ {
+			for x := 0; x < int(cols); x++ {
+				bestPoolImage := pool.Images[0]
+				for i, poolImage := range pool.Images {
+					if(i==0){
+						continue
+					}
+
+					poolImage.Resize(int(patchWidth), int(patchHeight))
+					poolImage.CalculateError(targetPatches)
+				}
+
+				//targetPatches = append(targetPatches, getPatchData(adjustedTarget, x, y, int(patchWidth), int(patchHeight)))
+			}
+		}*/
+
+		//for each patch in target calculate average diffance with every patch
+
+		//palette := make([]color.Color, 10)
+		/*for x := 0; x < 10; x++ {
+			for y := 0; y < 10; y++ {
+				fmt.Println(colordiff.Diff(target, targetImg.At(x+100, y+100)))
+			}
+		}*/
+		//fmt.Println(palette)
+		//x := colordiff.Closest(target, palette)
+		//fmt.Println("Closest:", x)
 
 		/*for _, poolImage := range pool.Images {
 			poolImage.Resize(int(patchWidth), int(patchHeight))
@@ -299,18 +419,18 @@ func main() {
 		// test color
 
 		/*
-			// test output
-			out, err := os.Create("C:/tmp/uploadedfile/HTML5_Logo_512___OUT.png")
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			err = png.Encode(out, adjustedTarget)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		*/
+		 */
+		// test output
+		out, err := os.Create("C:/tmp/uploadedfile/HTML5_Logo_512___OUT.png")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		err = png.Encode(out, adjustedTarget)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		return
 
 		//fmt.Println(cw)
@@ -393,4 +513,18 @@ func main() {
 	http.Handle("/", r)
 	fmt.Println("Running...\n")
 	http.ListenAndServe(":8080", nil)*/
+}
+
+func getPatchData(image image.Image, col, row int, patchWidth, patchHeight int) []color.Color {
+	//patchData := make([]color.Color, patchWidth*patchHeight)
+	patchData := []color.Color{}
+	xOfset := col * patchWidth
+	yOfset := row * patchHeight
+	for y := 0; y < patchHeight; y++ {
+		for x := 0; x < patchWidth; x++ {
+			rgbaPix := image.At(int(xOfset+x), int(yOfset+y))
+			patchData = append(patchData, rgbaPix)
+		}
+	}
+	return patchData
 }
