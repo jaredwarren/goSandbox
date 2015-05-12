@@ -4,6 +4,20 @@ import (
 	"math"
 )
 
+/*func getPatchData(image image.Image, col, row int, patchWidth, patchHeight int) []color.Color {
+	//patchData := make([]color.Color, patchWidth*patchHeight)
+	patchData := []color.Color{}
+	xOfset := col * patchWidth
+	yOfset := row * patchHeight
+	for y := 0; y < patchHeight; y++ {
+		for x := 0; x < patchWidth; x++ {
+			rgbaPix := image.At(int(xOfset+x), int(yOfset+y))
+			patchData = append(patchData, rgbaPix)
+		}
+	}
+	return patchData
+}
+*/
 /**
  * Implementation of "The CIEDE2000 Color-Difference Formula: Implementation Notes, Supplementary Test Data, and Mathematical Observations"
  * by Gaurav Sharma, Wencheng Wu and Edul N. Dalal

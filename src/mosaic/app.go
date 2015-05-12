@@ -121,9 +121,9 @@ func MakePool(path string) *Pool {
 	dir_to_scan := "C:/tmp/uploadedfile/pool"
 	files, _ := ioutil.ReadDir(dir_to_scan)
 
-	MaxImage := len(files)
+	MaxImage := 100
 	/*
-		MaxImage := 100
+		MaxImage := len(files)
 
 	*/
 
@@ -171,7 +171,7 @@ type PoolImage struct {
 	Height int
 	Aspect float64
 	Image  image.Image
-	Deltas []float64
+	Deltas map[string]float64
 }
 
 func (img *PoolImage) Resize(w, h int) {
@@ -182,26 +182,40 @@ func (img *PoolImage) Resize(w, h int) {
 	}
 }
 
+TODO: I'm going to try to calculate the average color in LAB for each patch and pool image, see if that's faster and still accurate
+
+
+// TODO: cache deltas
+//
+//
 // Calculate average error for each patch
-func (img *PoolImage) CalculateError(patches [][]color.Color) {
-	img.Deltas = make([]float64, len(patches))
-	for patchIndex, targetPatch := range patches {
-		if len(targetPatch) != img.Width*img.Height {
-			fmt.Println("ERROR:", len(targetPatch), "!=", img.Width*img.Height)
-		}
+func (img *PoolImage) CalculateError(image image.Image, col, row int, patchWidth, patchHeight int) float64 {
+	/*if len(targetPatch) != img.Width*img.Height {
+		fmt.Println("ERROR:", len(targetPatch), "!=", img.Width*img.Height)
+	}*/
 
-		totalDiff := 0.0
-		yIndex := 0
-		xIndex := 0
-		width := float64(img.Width)
-		for pixelIndex, targetColor := range targetPatch {
-			yIndex = int(math.Floor(float64(pixelIndex) / width))
-			xIndex = pixelIndex - (yIndex * img.Width)
-			totalDiff += colordiff.Diff(targetColor, img.Image.At(xIndex, yIndex))
+	totalDiff := 0.0
+	//yIndex := 0
+	//xIndex := 0
+	//width := float64(img.Width)
+	xOfset := col * patchWidth
+	yOfset := row * patchHeight
+	//c1 := color.NRGBA{0, 0, 0, 0}
+	for y := 0; y < patchHeight; y++ {
+		for x := 0; x < patchWidth; x++ {
+			//yIndex = yOfset + y
+			//xIndex = xOfset + x
+			totalDiff += colordiff.Diff(image.At(xOfset+x, yOfset+y), img.Image.At(x, y))
+			//totalDiff += colordiff.Diff(c1, c1)
 		}
-
-		img.Deltas[patchIndex] = totalDiff / float64(len(targetPatch))
 	}
+	/*for pixelIndex, targetColor := range targetPatch {
+		yIndex = int(math.Floor(float64(pixelIndex) / width))
+		xIndex = pixelIndex - (yIndex * img.Width)
+		totalDiff += colordiff.Diff(targetColor, img.Image.At(xIndex, yIndex))
+	}*/
+	//fmt.Println(totalDiff / float64(patchHeight*patchWidth))
+	return totalDiff / float64(patchHeight*patchWidth)
 }
 
 func main() {
@@ -232,6 +246,10 @@ func main() {
 		// patchHeight based on average of pool
 		patchHeight := float64(patchWidth) * pool.AverageAspect
 		fmt.Println("Patch:", patchWidth, patchHeight)
+		// resize pool
+		for _, poolImage := range pool.Images {
+			poolImage.Resize(int(patchWidth), int(patchHeight))
+		}
 
 		// adjust target
 		bounds := targetImg.Bounds()
@@ -251,37 +269,46 @@ func main() {
 		}
 		//cols := 50.0
 		//rows := 50.0
-		cols /= 2
-		rows /= 2
+		//cols /= 2
+		//rows /= 2
 		fmt.Println("cols:", cols, "rows:", rows)
 		newTargetW := int(cols * patchWidth)
 		newTargetH := int(rows * patchHeight)
 		adjustedTarget := imageutil.Resize(targetImg, newTargetW, newTargetH, imageutil.Lanczos)
 		fmt.Println(reflect.TypeOf(adjustedTarget), newTargetW, newTargetH)
 
-		targetPatches := [][]color.Color{}
-		for y := 0; y < int(rows); y++ {
-			for x := 0; x < int(cols); x++ {
-				targetPatches = append(targetPatches, getPatchData(adjustedTarget, x, y, int(patchWidth), int(patchHeight)))
+		//targetPatches := [][]color.Color{}
+		//imagePools := make([]*PoolImage, int(cols*rows))
+		outImage := image.NewRGBA(image.Rect(0, 0, newTargetW, newTargetH))
+		for row := 0; row < int(rows); row++ {
+			for col := 0; col < int(cols); col++ {
+				t0 := time.Now()
+				// find best match
+				var bestPoolImage *PoolImage
+				lowestDelta := math.MaxFloat64
+				for _, poolImage := range pool.Images {
+					delta := poolImage.CalculateError(adjustedTarget, col, row, int(patchWidth), int(patchHeight))
+					if delta < lowestDelta {
+						lowestDelta = delta
+						bestPoolImage = poolImage
+					}
+				}
+				fmt.Printf("Calculate Error: %v\n", time.Now().Sub(t0))
+				p := image.Pt(-col*int(patchWidth), -row*int(patchHeight))
+				draw.Draw(outImage, outImage.Bounds(), bestPoolImage.Image, p, draw.Src)
 			}
 		}
 		// calculate diff
 		// TODO: move this inside previous for loop?
 
-		t0 := time.Now()
-		for _, poolImage := range pool.Images {
+		/*for _, poolImage := range pool.Images {
 			poolImage.Resize(int(patchWidth), int(patchHeight))
 			poolImage.CalculateError(targetPatches)
-		}
-		fmt.Printf("Calculate Error: %v\n", time.Now().Sub(t0))
+		}*/
 
 		// Position pool
-		imagePools := make([]*PoolImage, int(cols*rows))
-		yIndex := 0
-		xIndex := 0
 
-		outImage := image.NewRGBA(image.Rect(0, 0, newTargetW, newTargetH))
-		for i, _ := range targetPatches {
+		/*for i, _ := range targetPatches {
 			var bestPoolImage *PoolImage
 			lowestError := math.MaxFloat64
 			for _, poolImage := range pool.Images {
@@ -295,7 +322,7 @@ func main() {
 			p := image.Pt(-xIndex*int(patchWidth), -yIndex*int(patchHeight))
 			draw.Draw(outImage, outImage.Bounds(), bestPoolImage.Image, p, draw.Src)
 			imagePools[i] = bestPoolImage
-		}
+		}*/
 
 		/*
 		 */
