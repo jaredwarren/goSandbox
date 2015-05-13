@@ -116,7 +116,7 @@ func MakePool(path string) *Pool {
 	dir_to_scan := "C:/tmp/uploadedfile/pool"
 	files, _ := ioutil.ReadDir(dir_to_scan)
 
-	MaxImage := 200
+	MaxImage := 300
 	/*
 		MaxImage := len(files)
 
