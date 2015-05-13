@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"image"
-	"image/color"
 	"image/draw"
 	"image/png"
 	"io"
@@ -116,7 +115,7 @@ func MakePool(path string) *Pool {
 	dir_to_scan := "C:/tmp/uploadedfile/pool"
 	files, _ := ioutil.ReadDir(dir_to_scan)
 
-	MaxImage := 300
+	MaxImage := 100
 	/*
 		MaxImage := len(files)
 
@@ -179,8 +178,8 @@ func (img *PoolImage) Resize(w, h int) {
 }
 func (img *PoolImage) CacheColors() {
 	img.Colors = []colordiff.LAB{}
-	for y := 0; y < img.Width; y++ {
-		for x := 0; x < img.Height; x++ {
+	for y := 0; y < img.Width; y += sampleSize {
+		for x := 0; x < img.Height; x += sampleSize {
 			img.Colors = append(img.Colors, colordiff.RgbToLab(img.Image.At(x, y)))
 		}
 	}
@@ -198,18 +197,31 @@ func (img *PoolImage) CalculateError(targetPatch []colordiff.LAB) float64 {
 	}
 
 	totalDiff := 0.0
-	for i, patchLab := range targetPatch {
-		totalDiff += colordiff.Diff2(patchLab, img.Colors[i])
+	for i := 0; i < len(targetPatch); i++ {
+		totalDiff += colordiff.Diff2(targetPatch[i], img.Colors[i])
 	}
+
+	/*for i, patchLab := range targetPatch {
+		totalDiff += colordiff.Diff2(patchLab, img.Colors[i])
+	}*/
 	//fmt.Println(totalDiff / float64(patchHeight*patchWidth))
 	return totalDiff / float64(len(targetPatch))
 }
+
+var sampleSize int = 1
 
 func main() {
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config")
 	}
+
+	ss, found := config.GetInt("options", "samplesize")
+	if !found {
+		log.Fatal("Couldn't get sampleSize")
+	}
+	sampleSize = ss
+	fmt.Println("sampleSize:", sampleSize)
 
 	// POOL Images
 	t0 := time.Now()
@@ -244,7 +256,6 @@ func main() {
 		targetWidth := float64(bounds.Max.X)
 		targetHeight := float64(bounds.Max.Y)
 		target_aspect := targetWidth / targetHeight
-		//target := &PoolImage{Name: "Target", Width: targetWidth, Height: targetHeight, Aspect: target_aspect, Image: targetImg}
 		cols, rows := 1.0, 1.0
 		poolLen := float64(len(pool.Images))
 		for cols*rows < poolLen {
@@ -256,33 +267,27 @@ func main() {
 				rows++
 			}
 		}
-		//cols := 50.0
-		//rows := 50.0
-		//cols /= 2
-		//rows /= 2
 		fmt.Println("cols:", cols, "rows:", rows)
 		newTargetW := int(cols * patchWidth)
 		newTargetH := int(rows * patchHeight)
-		//target.Resize(newTargetW, newTargetH)
-		//target.CacheColors()
 		adjustedTarget := imageutil.Resize(targetImg, newTargetW, newTargetH, imageutil.Lanczos)
-		//fmt.Println(reflect.TypeOf(adjustedTarget), newTargetW, newTargetH)
 
+		//compare with pool
 		t0 := time.Now()
-		counter := 0.0
-
-		//targetPatches := [][]color.Color{}
-		//imagePools := make([]*PoolImage, int(cols*rows))
+		percentCounter := 0.0
 		outImage := image.NewRGBA(image.Rect(0, 0, newTargetW, newTargetH))
 		for row := 0; row < int(rows); row++ {
 			for col := 0; col < int(cols); col++ {
-				//TODO: make PoolImage of patch
+				//patch := make([]colordiff.LAB, int(int(patchWidth)/sampleSize*int(patchHeight)/sampleSize))
 				patch := []colordiff.LAB{}
 				xOfset := col * int(patchWidth)
 				yOfset := row * int(patchHeight)
-				for y := 0; y < int(patchHeight); y++ {
-					for x := 0; x < int(patchWidth); x++ {
+				iCounter := 0
+				for y := 0; y < int(patchHeight); y += sampleSize {
+					for x := 0; x < int(patchWidth); x += sampleSize {
+						//patch[iCounter] = colordiff.RgbToLab(adjustedTarget.At(xOfset+x, yOfset+y))
 						patch = append(patch, colordiff.RgbToLab(adjustedTarget.At(xOfset+x, yOfset+y)))
+						iCounter++
 					}
 				}
 
@@ -299,8 +304,8 @@ func main() {
 				p := image.Pt(-col*int(patchWidth), -row*int(patchHeight))
 				draw.Draw(outImage, outImage.Bounds(), bestPoolImage.Image, p, draw.Src)
 				// percent
-				counter++
-				fmt.Print("\r", int((counter/(rows*cols))*100), "%")
+				percentCounter++
+				fmt.Print("\r", int((percentCounter/(rows*cols))*100), "%")
 
 			}
 		}
@@ -348,18 +353,4 @@ func main() {
 	http.Handle("/", r)
 	fmt.Println("Running...\n")
 	http.ListenAndServe(":8080", nil)*/
-}
-
-func getPatchData(image image.Image, col, row int, patchWidth, patchHeight int) []color.Color {
-	//patchData := make([]color.Color, patchWidth*patchHeight)
-	patchData := []color.Color{}
-	xOfset := col * patchWidth
-	yOfset := row * patchHeight
-	for y := 0; y < patchHeight; y++ {
-		for x := 0; x < patchWidth; x++ {
-			rgbaPix := image.At(int(xOfset+x), int(yOfset+y))
-			patchData = append(patchData, rgbaPix)
-		}
-	}
-	return patchData
 }
