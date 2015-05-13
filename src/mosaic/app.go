@@ -155,8 +155,8 @@ func MakePool(path string) *Pool {
 	return &Pool{Images: pool, AverageAspect: total_aspect / counter}
 }
 
-func Round(f float64) float64 {
-	return math.Floor(f + .5)
+func Round(f float64) int {
+	return int(math.Floor(f + .5))
 }
 
 type PoolImage struct {
@@ -223,6 +223,10 @@ func main() {
 	sampleSize = ss
 	fmt.Println("sampleSize:", sampleSize)
 
+	fmt.Println(Round(2.4))
+	fmt.Println(Round(2.5))
+	fmt.Println(Round(2.6))
+
 	// POOL Images
 	t0 := time.Now()
 	pool := MakePool("C:/tmp/uploadedfile/pool")
@@ -241,7 +245,7 @@ func main() {
 		if !found {
 			log.Fatal("Couldn't get patchWidth")
 		}
-		patchWidth := float64(pw)
+		patchWidth := pw
 		// patchHeight based on average of pool
 		patchHeight := float64(patchWidth) * pool.AverageAspect
 		fmt.Println("Patch:", patchWidth, patchHeight)
@@ -253,8 +257,8 @@ func main() {
 
 		// adjust target
 		bounds := targetImg.Bounds()
-		targetWidth := float64(bounds.Max.X)
-		targetHeight := float64(bounds.Max.Y)
+		targetWidth := bounds.Max.X
+		targetHeight := bounds.Max.Y
 		target_aspect := targetWidth / targetHeight
 		cols, rows := 1.0, 1.0
 		poolLen := float64(len(pool.Images))
