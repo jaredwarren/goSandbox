@@ -121,7 +121,7 @@ func MakePool(path string) *Pool {
 	dir_to_scan := "C:/tmp/uploadedfile/pool"
 	files, _ := ioutil.ReadDir(dir_to_scan)
 
-	MaxImage := 100
+	MaxImage := 200
 	/*
 		MaxImage := len(files)
 
@@ -182,8 +182,7 @@ func (img *PoolImage) Resize(w, h int) {
 	}
 }
 
-TODO: I'm going to try to calculate the average color in LAB for each patch and pool image, see if that's faster and still accurate
-
+//TODO: I'm going to try to calculate the average color in LAB for each patch and pool image, see if that's faster and still accurate
 
 // TODO: cache deltas
 //
@@ -277,12 +276,14 @@ func main() {
 		adjustedTarget := imageutil.Resize(targetImg, newTargetW, newTargetH, imageutil.Lanczos)
 		fmt.Println(reflect.TypeOf(adjustedTarget), newTargetW, newTargetH)
 
+		t0 := time.Now()
+		counter := 0.0
+
 		//targetPatches := [][]color.Color{}
 		//imagePools := make([]*PoolImage, int(cols*rows))
 		outImage := image.NewRGBA(image.Rect(0, 0, newTargetW, newTargetH))
 		for row := 0; row < int(rows); row++ {
 			for col := 0; col < int(cols); col++ {
-				t0 := time.Now()
 				// find best match
 				var bestPoolImage *PoolImage
 				lowestDelta := math.MaxFloat64
@@ -293,11 +294,15 @@ func main() {
 						bestPoolImage = poolImage
 					}
 				}
-				fmt.Printf("Calculate Error: %v\n", time.Now().Sub(t0))
 				p := image.Pt(-col*int(patchWidth), -row*int(patchHeight))
 				draw.Draw(outImage, outImage.Bounds(), bestPoolImage.Image, p, draw.Src)
+				// percent
+				counter++
+				fmt.Println(int((counter/(rows*cols))*100), "%")
+
 			}
 		}
+		fmt.Printf("Time: %v\n", time.Now().Sub(t0))
 		// calculate diff
 		// TODO: move this inside previous for loop?
 
