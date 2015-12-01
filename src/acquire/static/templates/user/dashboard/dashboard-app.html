@@ -57,7 +57,8 @@ core-scaffold[mode=cover] .content {
       </core-header-panel>
       <div tool>Title</div>
       <textarea id="message"></textarea>
-      <paper-button raised on-tap="{{onSubmit}}">Send</paper-button>
+      <paper-button raised on-tap="{{onSubmit}}">Send1</paper-button>
+      <paper-button raised on-tap="{{onSubmit2}}">Send2</paper-button>
       <div id="log"></div>
     </core-scaffold>
   </template>
@@ -175,6 +176,23 @@ core-scaffold[mode=cover] .content {
         var messageJson = {
           "Message": message,
           "Action": "message"
+        };
+        this.conn.send(JSON.stringify(messageJson));
+        this.$.message.value = ''
+        return false
+      },
+
+      onSubmit2: function() {
+        if (!this.conn) {
+          return false;
+        }
+        var message = this.$.message.value;
+        if (!message) {
+          return false;
+        }
+        var messageJson = {
+          "Message": message,
+          "Action": "message2"
         };
         this.conn.send(JSON.stringify(messageJson));
         this.$.message.value = ''

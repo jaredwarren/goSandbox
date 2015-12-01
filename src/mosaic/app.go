@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	//"reflect"
+	"sync"
 	"time"
 )
 
@@ -118,41 +119,46 @@ func MakePool(path string) *Pool {
 	MaxImage := 100
 	/*
 		MaxImage := len(files)
-
 	*/
 
-	//pool := make([]PoolImage, len(files))
 	pool := make([]*PoolImage, MaxImage)
 	total_aspect := float64(0)
 	counter := float64(0)
 	for key, imgFile := range files {
-		if reader, err := os.Open(filepath.Join(dir_to_scan, imgFile.Name())); err == nil {
-			defer reader.Close()
-			imageData, imageType, err := image.Decode(reader)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s: %v\n", imgFile.Name(), err)
-				continue
-			}
-			if imageType == "png" {
+		poolImage := loadFile(filepath.Join(dir_to_scan, imgFile.Name()))
+		total_aspect += poolImage.Aspect
+		pool[key] = poolImage
 
-			}
-			// TODO: resize to fit patch size
-			bounds := imageData.Bounds()
-			aspect := float64(bounds.Max.Y) / float64(bounds.Max.X)
-			total_aspect += aspect
-			counter++
-			pool[key] = &PoolImage{Name: imgFile.Name(), Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
-			if counter >= float64(MaxImage) {
-				break
-			}
-		} else {
-			fmt.Println("Impossible to open the file:", err)
+		counter++
+		if counter >= float64(MaxImage) {
+			break
 		}
+	}
+	return &Pool{Images: pool, AverageAspect: total_aspect / counter}
+}
+
+func loadFile(filePath string) *PoolImage {
+	if reader, err := os.Open(filePath); err == nil {
+		defer reader.Close()
+		imageData, imageType, err := image.Decode(reader)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %v\n", filePath, err)
+			return nil
+		}
+		if imageType == "png" {
+
+		}
+		bounds := imageData.Bounds()
+		aspect := float64(bounds.Max.Y) / float64(bounds.Max.X)
+		return &PoolImage{Name: filePath, Width: bounds.Max.Y, Height: bounds.Max.X, Aspect: aspect, Image: imageData}
+
+	} else {
+		fmt.Println("Impossible to open the file:", err)
 	}
 	if err != nil {
 		panic(err)
 	}
-	return &Pool{Images: pool, AverageAspect: total_aspect / counter}
+	return nil
 }
 
 func Round(f float64) int {
@@ -201,10 +207,6 @@ func (img *PoolImage) CalculateError(targetPatch []colordiff.LAB) float64 {
 		totalDiff += colordiff.Diff2(targetPatch[i], img.Colors[i])
 	}
 
-	/*for i, patchLab := range targetPatch {
-		totalDiff += colordiff.Diff2(patchLab, img.Colors[i])
-	}*/
-	//fmt.Println(totalDiff / float64(patchHeight*patchWidth))
 	return totalDiff / float64(len(targetPatch))
 }
 
@@ -221,17 +223,11 @@ func main() {
 		log.Fatal("Couldn't get sampleSize")
 	}
 	sampleSize = ss
-	fmt.Println("sampleSize:", sampleSize)
-
-	fmt.Println(Round(2.4))
-	fmt.Println(Round(2.5))
-	fmt.Println(Round(2.6))
+	fmt.Println("Sample Size:", sampleSize)
 
 	// POOL Images
-	t0 := time.Now()
 	pool := MakePool("C:/tmp/uploadedfile/pool")
-	fmt.Println("Pool:", len(pool.Images))
-	fmt.Printf("Make Pool: %v\n", time.Now().Sub(t0))
+	fmt.Println("Pool Size:", len(pool.Images))
 
 	// TARGET Image
 	if reader, err := os.Open("C:/tmp/uploadedfile/HTML5_Logo_512.png"); err == nil {
@@ -241,13 +237,12 @@ func main() {
 			return
 		}
 		// patch size
-		pw, found := config.GetInt("options", "patchwidth")
+		patchWidth, found := config.GetInt("options", "patchwidth")
 		if !found {
 			log.Fatal("Couldn't get patchWidth")
 		}
-		patchWidth := pw
 		// patchHeight based on average of pool
-		patchHeight := float64(patchWidth) * pool.AverageAspect
+		patchHeight := Round(float64(patchWidth) * pool.AverageAspect)
 		fmt.Println("Patch:", patchWidth, patchHeight)
 		// resize pool
 		for _, poolImage := range pool.Images {
@@ -259,13 +254,13 @@ func main() {
 		bounds := targetImg.Bounds()
 		targetWidth := bounds.Max.X
 		targetHeight := bounds.Max.Y
-		target_aspect := targetWidth / targetHeight
-		cols, rows := 1.0, 1.0
-		poolLen := float64(len(pool.Images))
+		target_aspect := float64(targetWidth) / float64(targetHeight)
+		cols, rows := 1, 1
+		poolLen := len(pool.Images)
 		for cols*rows < poolLen {
-			col_asp := (cols + 1) * patchWidth / (math.Ceil(poolLen/(cols+1)) * patchHeight)
-			row_asp := cols * patchWidth / (math.Ceil(poolLen/cols) * patchHeight)
-			if math.Abs(col_asp-target_aspect) < math.Abs(row_asp-target_aspect) {
+			colAspect := (float64(cols + 1)) * float64(patchWidth) / (math.Ceil(float64(poolLen)/float64(cols+1)) * float64(patchHeight))
+			rowAspect := float64(cols*patchWidth) / (math.Ceil(float64(poolLen)/float64(cols)) * float64(patchHeight))
+			if math.Abs(colAspect-target_aspect) < math.Abs(rowAspect-target_aspect) {
 				cols++
 			} else {
 				rows++
@@ -274,23 +269,35 @@ func main() {
 		fmt.Println("cols:", cols, "rows:", rows)
 		newTargetW := int(cols * patchWidth)
 		newTargetH := int(rows * patchHeight)
+		fmt.Println("New Target Size:", newTargetW, newTargetH)
 		adjustedTarget := imageutil.Resize(targetImg, newTargetW, newTargetH, imageutil.Lanczos)
+
+		//TODO: see if I can't use GO Routines
 
 		//compare with pool
 		t0 := time.Now()
 		percentCounter := 0.0
 		outImage := image.NewRGBA(image.Rect(0, 0, newTargetW, newTargetH))
-		for row := 0; row < int(rows); row++ {
-			for col := 0; col < int(cols); col++ {
-				//patch := make([]colordiff.LAB, int(int(patchWidth)/sampleSize*int(patchHeight)/sampleSize))
-				patch := []colordiff.LAB{}
-				xOfset := col * int(patchWidth)
-				yOfset := row * int(patchHeight)
+		/*// resize pool
+		var wg sync.WaitGroup
+		for _, poolImage := range pool.Images {
+			wg.Add(1)
+			go func(pi *PoolImage) {
+				defer wg.Done()
+				pi.Resize(int(patchWidth), int(patchHeight))
+				pi.CacheColors()
+			}(poolImage)
+		}
+		wg.Wait()*/
+		for row := 0; row < rows; row++ {
+			for col := 0; col < cols; col++ {
+				patch := make([]colordiff.LAB, int(math.Ceil(float64(patchWidth)/float64(sampleSize))*math.Ceil(float64(patchHeight)/float64(sampleSize))))
+				xOfset := col * patchWidth
+				yOfset := row * patchHeight
 				iCounter := 0
-				for y := 0; y < int(patchHeight); y += sampleSize {
-					for x := 0; x < int(patchWidth); x += sampleSize {
-						//patch[iCounter] = colordiff.RgbToLab(adjustedTarget.At(xOfset+x, yOfset+y))
-						patch = append(patch, colordiff.RgbToLab(adjustedTarget.At(xOfset+x, yOfset+y)))
+				for y := 0; y < patchHeight; y += sampleSize {
+					for x := 0; x < patchWidth; x += sampleSize {
+						patch[iCounter] = colordiff.RgbToLab(adjustedTarget.At(xOfset+x, yOfset+y))
 						iCounter++
 					}
 				}
@@ -309,10 +316,11 @@ func main() {
 				draw.Draw(outImage, outImage.Bounds(), bestPoolImage.Image, p, draw.Src)
 				// percent
 				percentCounter++
-				fmt.Print("\r", int((percentCounter/(rows*cols))*100), "%")
+				fmt.Print("\r", int((percentCounter/float64(rows*cols))*100), "%")
 
 			}
 		}
+		fmt.Println("")
 		fmt.Printf("Time: %v\n", time.Now().Sub(t0))
 		// test output
 		out, err := os.Create("C:/tmp/uploadedfile/HTML5_Logo_512___OUT.png")

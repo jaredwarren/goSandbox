@@ -2,11 +2,24 @@ package conn
 
 import (
 	"fmt"
-	//_ "github.com/go-sql-driver/mysql"
-
 	"github.com/gorilla/websocket"
 	"litmosauthor.com/unison/user"
 	"net/http"
+	"time"
+)
+
+const (
+	// Time allowed to write a message to the peer.
+	writeWait = 10 * time.Second
+
+	// Time allowed to read the next pong message from the peer.
+	pongWait = 60 * time.Second
+
+	// Send pings to peer with this period. Must be less than pongWait.
+	pingPeriod = (pongWait * 9) / 10
+
+	// Maximum message size allowed from peer.
+	maxMessageSize = 512
 )
 
 type connection struct {
@@ -19,41 +32,73 @@ type connection struct {
 	// The hub.
 	h  *hub
 	wr *SocketRouter
+
+	u *user.User
 }
 
 func (c *connection) reader() {
+	defer func() {
+		c.h.unregister <- c
+		c.ws.Close()
+	}()
+	c.ws.SetReadLimit(maxMessageSize)
+	c.ws.SetReadDeadline(time.Now().Add(pongWait))
+	c.ws.SetPongHandler(func(string) error {
+		c.ws.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 	for {
 		message := msg{}
-		err := c.ws.ReadJSON(&message)
-		if err != nil {
+		if err := c.ws.ReadJSON(&message); err != nil {
 			fmt.Println("ReadJSON Error", err)
-			// TODO: write filed message?
 			break
 		}
 
-		//TODO: see if I can create some sort of router to route actions...
+		message.Sender = c.u.Username
+
+		// rebradsast message to others
 		if !c.wr.Match(message) {
-			fmt.Println("No action:", message)
+			fmt.Println("No matching action:", message)
 		} else {
 			fmt.Println("<=", message)
 			c.h.broadcast <- message
 		}
 	}
-	c.ws.Close()
 }
 
 func (c *connection) writer() {
-	for message := range c.send {
-		//err := c.ws.WriteMessage(websocket.TextMessage, message)
-		err := c.ws.WriteJSON(message)
-		if err != nil {
-			fmt.Println("writerError:", err)
-			// TODO: write filed message?
-			break
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+		c.ws.Close()
+	}()
+	for {
+		select {
+		case message, ok := <-c.send:
+			if !ok {
+				c.write(websocket.CloseMessage, []byte{})
+				return
+			}
+			if err := c.writeJson(message); err != nil {
+				return
+			}
+		case <-ticker.C:
+			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
+				return
+			}
 		}
-		fmt.Println("=>", message)
 	}
-	c.ws.Close()
+}
+func (c *connection) write(mt int, payload []byte) error {
+	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
+	return c.ws.WriteMessage(mt, payload)
+}
+
+// write writes a message with the given message type and payload.
+func (c *connection) writeJson(message msg) error {
+	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
+	fmt.Println("=>", message)
+	return c.ws.WriteJSON(message)
 }
 
 var upgrader = &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
@@ -66,30 +111,34 @@ type wsHandler struct {
 type msg struct {
 	Action  string
 	Message string
+	Sender  string
 }
 
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// make sure session is valid
-	userName := user.GetUserName(r)
-	if userName == nil {
+	user := user.GetUserName(r)
+	if user == nil {
 		fmt.Println("No User")
 		// TODO: throw error
 		return
 	}
+
 	// setup websocket
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
-	c := &connection{send: make(chan msg, 256), ws: ws, h: wsh.h, wr: wsh.wr}
+	c := &connection{send: make(chan msg, 256), ws: ws, h: wsh.h, wr: wsh.wr, u: user}
 	c.h.register <- c
 	defer func() { c.h.unregister <- c }()
+
+	// start writer
 	go c.writer()
 
 	// broadcast new user
-	m := msg{Message: "New User:" + userName.Username, Action: "message"}
+	m := msg{Message: "New User:" + user.Username, Action: "message"}
 	c.h.broadcast <- m
 
-	// blocking
+	// start reader, blocking
 	c.reader()
 }

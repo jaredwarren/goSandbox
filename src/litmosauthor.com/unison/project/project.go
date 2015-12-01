@@ -2,14 +2,11 @@ package project
 
 import (
 	"database/sql"
-
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"html/template"
 	"litmosauthor.com/unison/common"
 	"log"
 	"net/http"
-	//"reflect"
 )
 
 type Projects []Project
@@ -62,9 +59,7 @@ func Dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	//fmt.Println(projects.HasProjects())
 
 	// for now parse every request so I don't have to recompile, maybe
-	tmpl := make(map[string]*template.Template)
-	tmpl["index.html"] = template.Must(template.ParseFiles("static/templates/index.html", "static/templates/content.html", "static/templates/base.html"))
-	tmpl["other.html"] = template.Must(template.ParseFiles("static/templates/other.html", "static/templates/base.html"))
+	//tmpl := make(map[string]*template.Template)
 
 	//fmt.Println(common.GetCustId(w, r))
 

@@ -67,6 +67,6 @@ func main() {
 
 	// wait for clients
 	http.Handle("/", r)
-	fmt.Println("Running...\n")
+	fmt.Println("Running...:8080\n")
 	http.ListenAndServe(":8080", nil)
 }

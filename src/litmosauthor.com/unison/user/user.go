@@ -7,15 +7,10 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/securecookie"
-	"html/template"
+	"golang.org/x/crypto/bcrypt"
 	"litmosauthor.com/unison/common"
 	"log"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
-
-	// TODO: import this
-	//"github.com/karlseguin/typed"
 )
 
 type Users []User
@@ -95,15 +90,11 @@ func loginForm(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	// for now parse every request so I don't have to recompile, maybe
-	//tmpl := make(map[string]*template.Template)
-	tmpl := template.Must(template.ParseFiles("static/templates/user/index.html", "static/templates/user/base.html"))
-
 	pagedata := &common.Page{Tags: &common.Tags{Id: 1, Name: "golang"},
 		Content: &common.Content{Id: 9, Title: "Hello", Content: "World!"},
 		Comment: &common.Comment{Id: 2, Note: "Good Day!"}}
 
-	tmpl.ExecuteTemplate(w, "base", pagedata)
+	tmpl["login.html"].ExecuteTemplate(w, "base", pagedata)
 }
 
 func login(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -147,30 +138,11 @@ func dashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	// for now parse every request so I don't have to recompile, maybe
-	tmpl := template.Must(template.ParseFiles("static/templates/user/dashboard/index.html", "static/templates/user/base.html"))
-
-	pagedata := &common.Page{Tags: &common.Tags{Id: 1, Name: "golang"},
+	pagedata := &common.Page{
+		Tags:    &common.Tags{Id: 1, Name: "golang"},
 		Content: &common.Content{Id: 9, Title: "Hello", Content: "World!"},
-		Comment: &common.Comment{Id: 2, Note: "Good Day!"}}
-
-	tmpl.ExecuteTemplate(w, "base", pagedata)
-}
-
-func dashboardApp(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	userName := GetUserName(r)
-	if userName == nil {
-		http.Redirect(w, r, "/user/login/", 302)
-		return
+		Comment: &common.Comment{Id: 2, Note: "Good Day!"},
 	}
 
-	// for now parse every request so I don't have to recompile, maybe
-	// // TODO: create dasboard base
-	tmpl := template.Must(template.ParseFiles("static/templates/user/dashboard/dashboard-app.html"))
-
-	pagedata := &common.Page{Tags: &common.Tags{Id: 1, Name: "golang"},
-		Content: &common.Content{Id: 9, Title: "Hello", Content: "World!"},
-		Comment: &common.Comment{Id: 2, Note: "Good Day!"}}
-
-	tmpl.ExecuteTemplate(w, "dashboardApp", pagedata)
+	tmpl["dashboard.html"].ExecuteTemplate(w, "base", pagedata)
 }

@@ -1,5 +1,9 @@
 package conn
 
+import (
+	_ "fmt"
+)
+
 // NewRouter returns a new router instance.
 func NewStockRouter() *SocketRouter {
 	return &SocketRouter{}

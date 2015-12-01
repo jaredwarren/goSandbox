@@ -58,6 +58,7 @@ core-scaffold[mode=cover] .content {
       <div tool>Title</div>
       <textarea id="message"></textarea>
       <paper-button raised on-tap="{{onSubmit}}">Send</paper-button>
+      <paper-button raised on-tap="{{onSubmit2}}">Send2</paper-button>
       <div id="log"></div>
     </core-scaffold>
   </template>
@@ -131,19 +132,12 @@ core-scaffold[mode=cover] .content {
               me.appendLog("ERROR:");
             }
           } catch (e) {
-            debugger;
             me.appendLog("<div><b>Connection closed.</b></div>")
           }
         } else {
           me.appendLog("<div><b>Your browser does not support WebSockets.</b></div>")
         }
-
-
       },
-
-
-
-
 
       conn: null,
 
@@ -151,16 +145,19 @@ core-scaffold[mode=cover] .content {
         console.log("processResponse:", response);
         switch (response.Action) {
           case "message":
-            this.appendLog(response.Message);
+            this.appendLog(response);
+            break;
+          case "message2":
+            this.appendLog(response);
             break;
           default:
-            alert("Invalid Action:", response.Action);
+            console.warn("Invalid Action:", response.Action);
             break;
         }
       },
 
-      appendLog: function(responseString) {
-        this.$.log.appendChild(this.injectBoundHTML(responseString + "<br/>"));
+      appendLog: function(response) {
+        this.$.log.appendChild(this.injectBoundHTML(response.Action + ' - ' + response.Sender + ' - ' + response.Message + "<br/>"));
       },
 
 
@@ -175,6 +172,23 @@ core-scaffold[mode=cover] .content {
         var messageJson = {
           "Message": message,
           "Action": "message"
+        };
+        this.conn.send(JSON.stringify(messageJson));
+        this.$.message.value = ''
+        return false
+      },
+
+      onSubmit2: function() {
+        if (!this.conn) {
+          return false;
+        }
+        var message = this.$.message.value;
+        if (!message) {
+          return false;
+        }
+        var messageJson = {
+          "Message": message,
+          "Action": "message2"
         };
         this.conn.send(JSON.stringify(messageJson));
         this.$.message.value = ''
