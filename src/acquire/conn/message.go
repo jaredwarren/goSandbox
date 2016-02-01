@@ -1,9 +1,5 @@
 package conn
 
-import (
-	"acquire/game"
-)
-
 // General message struct which is used for parsing client requests and sending
 // back responses.
 type Message struct {

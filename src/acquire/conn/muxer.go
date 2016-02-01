@@ -1,14 +1,14 @@
 package conn
 
 import (
-	//"database/sql"
+	"acquire/ini"
+	"database/sql"
 	"fmt"
-	//_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
-func MakeMuxer(prefix string) http.Handler {
+func MakeMuxer(prefix string, db *sql.DB, config *ini.Dict) http.Handler {
 	var m *mux.Router
 	if prefix == "" {
 		m = mux.NewRouter()

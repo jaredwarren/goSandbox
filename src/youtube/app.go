@@ -1,16 +1,16 @@
 package main
 
 import (
-	"acquire/conn"
-	_ "acquire/game"
-	"acquire/ini"
-	"acquire/user"
 	"database/sql"
 	"flag"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	//"youtube/channel"
+	"youtube/ini"
+	"youtube/watch"
 )
 
 var (
@@ -23,10 +23,6 @@ var alphaDB *sql.DB
 var config ini.Dict
 var err error
 
-func ProductsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("ProductsHandler::Dashboard")
-}
-
 func main() {
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
@@ -34,15 +30,15 @@ func main() {
 	}
 
 	// setup DB
-	dbName, found := config.GetString("alphadb", "name")
+	dbName, found := config.GetString("sandboxdb", "name")
 	if !found {
 		log.Fatal("Couldn't get name")
 	}
-	dbUser, found := config.GetString("alphadb", "user")
+	dbUser, found := config.GetString("sandboxdb", "user")
 	if !found {
 		log.Fatal("Couldn't get user")
 	}
-	dbPassword, found := config.GetString("alphadb", "password")
+	dbPassword, found := config.GetString("sandboxdb", "password")
 	if !found {
 		log.Fatal("Couldn't get password")
 	}
@@ -51,16 +47,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Routs
 	r := router
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	//http.Handle("/game/", game.MakeMuxer("/game/", alphaDB, config))
-	http.Handle("/user/", user.MakeMuxer("/user/", alphaDB, &config))
-
-	// websocket
-	http.Handle("/ws/", conn.MakeMuxer("/ws/", alphaDB, &config))
-
-	// wait for clients
+	http.Handle("/watch/", watch.MakeMuxer("/watch/", alphaDB, &config))
+	//http.Handle("/channels/", channel.MakeMuxer("/channels/", alphaDB, &config))
 	http.Handle("/", r)
 	fmt.Println("Running... :8080\n")
 	http.ListenAndServe(":8080", nil)

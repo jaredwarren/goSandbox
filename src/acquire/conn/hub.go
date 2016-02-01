@@ -5,45 +5,31 @@ type hub struct {
 	connections map[*connection]bool
 
 	// Inbound messages from the connections.
-	broadcast chan Message
+	broadcast chan msg
 
 	// Register requests from the connections.
 	register chan *connection
 
 	// Unregister requests from connections.
 	unregister chan *connection
-
-	// gamse
-	//games map[int]map[*connection]bool
 }
 
 func newHub() *hub {
 	return &hub{
-		broadcast:   make(chan Message),
+		broadcast:   make(chan msg),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
 		connections: make(map[*connection]bool),
-		//games:       make(map[int]map[*connection]bool),
 	}
 }
 
 func (h *hub) run() {
-	var players
 	for {
 		select {
 		case c := <-h.register:
-			if players == nil {
-				players = make(map[*connection]bool, 6)
-			}
-			players[c] = true
-			n := len(players)
-			if n == 6 {
-				game.Play(players)
-				players = nil
-			}
+			h.connections[c] = true
 		case c := <-h.unregister:
 			if _, ok := h.connections[c]; ok {
-				// TODO: broadcast message to all connections? here or in conn.go?
 				delete(h.connections, c)
 				close(c.send)
 			}

@@ -1,18 +1,17 @@
 package game
 
 import (
-	//"acquire/common"
+	"acquire/ini"
+	"database/sql"
 	"fmt"
 	"html/template"
-	//"log"
 	"net/http"
-	//"reflect"
 )
 
 // TODO: uncomment this for production
 //var tmpl = template.Must(template.ParseFiles("static/templates/user/dashboard/index.html", "static/templates/user/base.html"))
 
-func newgame(w http.ResponseWriter, r *http.Request) {
+func newgame(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
 	fmt.Println("game::newgame")
 
 	// for now parse every request so I don't have to recompile

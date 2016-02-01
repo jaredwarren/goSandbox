@@ -1,13 +1,13 @@
 package common
 
 import (
-	"acquire/ini"
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
 	"strings"
+	"youtube/ini"
 )
 
 type Tags struct {
@@ -47,7 +47,7 @@ func StaticHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func NotFoundFunc(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func NotFoundFunc(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	category := vars["path"]
 	fmt.Println("Project::NotFoundFunc - " + category)
