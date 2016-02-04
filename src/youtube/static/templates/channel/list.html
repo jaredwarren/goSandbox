@@ -1,0 +1,83 @@
+{{define "head"}}
+<script>
+  $(function() {
+  	$("#addNewChannel")
+  		.button()
+  		.click(function(event) {
+  			event.preventDefault();
+  			var tags = [];
+  			$('input[type="checkbox"]:checked').each(function(e, f) {
+  				console.log(e, $(f).val())
+  				tags.push($(f).val())
+  			});
+  			$.ajax({
+  				type: "POST",
+  				url: '/channels/',
+  				data: {
+  					channelId: $('#newchannel').val(),
+  					tags: tags
+  				},
+  				dataType: 'application/json; charset=UTF-8',
+  				success: function(e, f, g, h) {
+  					console.log(e, f, g, h);
+  				},
+  				complete: function(e, f, g, h) {
+  					console.log(e, f, g, h);
+  				}
+  			});
+  		}).prop('disabled', true);
+  	$("#newchannel").keyup(function(event) {
+  		event.preventDefault();
+  		var $me = $(this)
+  		$("#addNewChannel").prop('disabled', ($me.val() == ''));
+  	});
+
+  	$(".deleteChannel")
+  		.button()
+  		.click(function(event) {
+  			event.preventDefault();
+  			if (window.confirm("Are you sure you want to delete this channel?")) {
+  				$.ajax({
+  					type: "DELETE",
+  					url: '/channels/',
+  					data: {
+  						channelId: this.dataset.id
+  					},
+  					success: function(e, f, g, h) {
+  						debugger;
+  					}
+  				});
+  			}
+  		});
+  });
+  </script>
+{{end}}
+
+{{define "body"}}
+	<div>
+		<input type="text" id="newchannel">
+		<button id="addNewChannel">Add</button>
+	</div>
+	{{range $key, $tag := .Tags}}
+		<div>
+			<input type="checkbox" name="{{$tag.TagId}}" id="{{$key}}" value="{{$tag.TagId}}" checked="checked" />
+			<label for="{{$key}}">{{$key}}</label>
+		</div>
+	{{end}}
+	<hr>
+	<ul>
+		{{range $key, $channel := .Channels}}
+			<li>
+				<a href="https://www.youtube.com/{{$key}}/videos"><span style="font-weight: bold;">{{$key}}</span></a><button class="tagChannel" data-id="{{$key}}">tag</button><button class="deleteChannel" data-id="{{$key}}">X</button>
+				<ul>
+					{{range $tagname, $tag := $channel.Tags}}
+						<li> 
+							{{$tagname}}
+						</li>
+					{{end}}
+				</ul>
+			</li>
+		{{end}}
+	</ul>
+{{end}}
+

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	//"youtube/channel"
+	"youtube/channel"
 	"youtube/ini"
 	"youtube/watch"
 )
@@ -24,6 +24,7 @@ var config ini.Dict
 var err error
 
 func main() {
+
 	config, err = ini.Load("ini/config.ini")
 	if err != nil {
 		log.Fatal("Failed to load config")
@@ -49,7 +50,7 @@ func main() {
 
 	r := router
 	http.Handle("/watch/", watch.MakeMuxer("/watch/", alphaDB, &config))
-	//http.Handle("/channels/", channel.MakeMuxer("/channels/", alphaDB, &config))
+	http.Handle("/channels/", channel.MakeMuxer("/channels/", alphaDB, &config))
 	http.Handle("/", r)
 	fmt.Println("Running... :8080\n")
 	http.ListenAndServe(":8080", nil)
