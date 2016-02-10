@@ -1,0 +1,12 @@
+{{define "base"}}
+<html>
+  	<head>
+  		<meta name="application-name" content="{{.Title}}">
+		<title>{{.Title}}</title>
+  		{{template "head" .}}
+  	</head>
+	<body>
+		{{template "body" .}}
+	</body>
+</html>
+{{end}}

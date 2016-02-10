@@ -1,0 +1,17 @@
+{{define "head"}}
+{{end}}
+
+{{define "body"}}
+	<div style="padding: 0; margin: 0; list-style: none; display: flex; -webkit-flex-flow: row wrap; justify-
+	content: space-around;">
+		{{range $key, $video := .Videos}}
+			<div style="width: 196px; margin: 4px; padding: 4px; box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.26); border: 1px solid #3E89CC;">
+				<a href="https://www.youtube.com/{{$video.ChannelId}}/videos"><img class="channel-header-profile-image" src="{{$video.ChannelIcon}}" title="{{$video.ChannelName}}" alt="{{$video.ChannelName}}" style="width: 20px; height: 20px;"><span style="font-weight: bold;">{{$video.ChannelName}}</span></a>
+				<a class="title-link" href="https://www.youtube.com/watch?v={{$video.Id}}">
+				<img src="//i.ytimg.com/vi/{{$video.Id}}/mqdefault.jpg" alt="" width="196" style="display: block;" >
+				<span style="display: block;">{{$video.Title}}</span></a>
+				<span style="display: block;">{{$video.TimeString}}</span>
+			</div>
+		{{end}}
+	</div>
+{{end}}
