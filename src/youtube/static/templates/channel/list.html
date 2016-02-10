@@ -60,22 +60,15 @@
 	</div>
 	{{range $key, $tag := .Tags}}
 		<div>
-			<input type="checkbox" name="{{$tag.TagId}}" id="{{$key}}" value="{{$tag.TagId}}" checked="checked" />
-			<label for="{{$key}}">{{$key}}</label>
+			<input type="checkbox" name="{{$tag.TagId}}" id="{{$tag.TagName}}" value="{{$tag.TagId}}" checked="checked" />
+			<label for="{{$tag.TagName}}">{{$tag.TagName}}</label>
 		</div>
 	{{end}}
 	<hr>
 	<ul>
 		{{range $key, $channel := .Channels}}
 			<li>
-				<a href="https://www.youtube.com/{{$key}}/videos"><span style="font-weight: bold;">{{$key}}</span></a><button class="tagChannel" data-id="{{$key}}">tag</button><button class="deleteChannel" data-id="{{$key}}">X</button>
-				<ul>
-					{{range $tagname, $tag := $channel.Tags}}
-						<li> 
-							{{$tagname}}
-						</li>
-					{{end}}
-				</ul>
+				<a href="https://www.youtube.com/{{$channel.ChannelURL}}/videos"><span style="font-weight: bold;">{{$channel.ChannelURL}}</span></a><button class="tagChannel" data-id="{{$channel.ChannelURL}}">tag</button><button class="deleteChannel" data-id="{{$channel.ChannelURL}}">X</button>
 			</li>
 		{{end}}
 	</ul>

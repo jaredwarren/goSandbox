@@ -17,7 +17,7 @@ import (
 )
 
 type Page struct {
-	Channels ChannelList
+	Channels []Channel
 	Tags     []tag.Tag
 	Title    string
 }
@@ -30,7 +30,7 @@ type ChannelList struct {
 
 func (r *ChannelList) HasChannel(channelUrl string) bool {
 	for _, channel := range r.Channels {
-		if channel.ChannelURl == channelUrl {
+		if channel.ChannelURL == channelUrl {
 			return true
 		}
 	}
@@ -44,13 +44,15 @@ func (r *ChannelList) Size() int {
 
 type Channel struct {
 	ChannelId   string
-	ChannelURl  string
+	ChannelURL  string
 	Tags        []tag.Tag
 	Title       string
 	ChannelIcon string
 	ChannelName string
 	Videos      []Video
 }
+
+// Video
 
 type Video struct {
 	Title       string
@@ -61,6 +63,13 @@ type Video struct {
 	Time        time.Time
 	Id          string
 }
+
+// sort
+type ByTime []Video
+
+func (a ByTime) Len() int           { return len(a) }
+func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time) }
 
 // request
 type SPF struct {
@@ -126,9 +135,9 @@ func GetChannelVideos(channelList ChannelList) ChannelList {
 
 // stuff
 func attachChannelVideos(channel Channel) Channel {
-	resp, err := http.Get("https://www.youtube.com/" + channel.ChannelURl + "/videos?spf=navigate")
+	resp, err := http.Get("https://www.youtube.com/" + channel.ChannelURL + "/videos?spf=navigate")
 	if err != nil {
-		fmt.Println(".....")
+		fmt.Println("Response Error")
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
@@ -140,8 +149,10 @@ func attachChannelVideos(channel Channel) Channel {
 	bodyString := string(data.Body.Content)
 	titleRe := regexp.MustCompile("\"channel-header-profile-image\".src=\"(.+?)\".+?title=\"(.+?)\"")
 	m := titleRe.FindAllStringSubmatch(bodyString, -1)
-	if len(m) == 0 {
-		fmt.Println(bodyString)
+	if len(m) < 1 {
+		fmt.Println("EmptyBody...")
+		fmt.Println(data)
+		return channel
 	}
 	matches := m[0]
 	channelIcon := matches[1]
@@ -159,7 +170,7 @@ func attachChannelVideos(channel Channel) Channel {
 		videos[i] = Video{
 			Id:          idMatches[i][1],
 			ChannelName: title,
-			ChannelId:   channel.ChannelURl,
+			ChannelId:   channel.ChannelURL,
 			ChannelIcon: channelIcon,
 			Title:       html.UnescapeString(idMatches[i][2]),
 			Time:        strtotime(timeMatches[i][1]),
@@ -169,7 +180,6 @@ func attachChannelVideos(channel Channel) Channel {
 	channel.ChannelName = title
 	channel.ChannelIcon = channelIcon
 	channel.Videos = videos
-	//fmt.Printf(title, len(videos))
 	return channel
 }
 
@@ -200,12 +210,12 @@ func getAsyncChannelVideos(channels ChannelList) ChannelList {
 
 // API
 func ListChannels(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
-	channels := GetChannelList(db)
+	channels := GetChannelList(db, "all")
 
 	pagedata := &Page{
 		Title:    "Channels",
 		Tags:     tag.GetTagList(db),
-		Channels: channels,
+		Channels: channels.Channels,
 	}
 
 	tmpl["list.html"].ExecuteTemplate(w, "base", pagedata)
@@ -218,10 +228,14 @@ type ChannelListRow struct {
 	tagNames   string `db:"tagNames"`
 }
 
-func GetChannelList(db *sql.DB) ChannelList {
+func GetChannelList(db *sql.DB, tagFilter string) ChannelList {
 	var channelList = ChannelList{}
 
-	rows, err := db.Query("SELECT  channels.id as channelId, channels.url as channelUrl, GROUP_CONCAT(DISTINCT tag.id) as tagIds, GROUP_CONCAT(DISTINCT tag.name) as tagNames FROM channels LEFT JOIN channel_x_tag ON channels.id = channel_x_tag.channelId LEFT JOIN tag ON channel_x_tag.tagId = tag.id GROUP BY channelId")
+	if tagFilter == "all" {
+		tagFilter = "youtube"
+	}
+
+	rows, err := db.Query("SELECT  channels.id as channelId, channels.url as channelUrl, GROUP_CONCAT(DISTINCT tag.id) as tagIds, GROUP_CONCAT(DISTINCT tag.name) as tagNames FROM channels LEFT JOIN channel_x_tag ON channels.id = channel_x_tag.channelId LEFT JOIN tag ON channel_x_tag.tagId = tag.id WHERE tag.name= ? GROUP BY channelId", tagFilter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -238,7 +252,7 @@ func GetChannelList(db *sql.DB) ChannelList {
 			tags[i] = tag.Tag{tagIdList[i], tagNameList[i]}
 		}
 
-		channelList.Channels = append(channelList.Channels, Channel{ChannelId: row.ChannelId, ChannelURl: row.ChannelUrl, Tags: tags})
+		channelList.Channels = append(channelList.Channels, Channel{ChannelId: row.ChannelId, ChannelURL: row.ChannelUrl, Tags: tags})
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
@@ -276,7 +290,7 @@ func CreateChannels(w http.ResponseWriter, r *http.Request, db *sql.DB, config *
 
 	fmt.Printf("%+v\n", channelId)
 
-	channelList := GetChannelList(db)
+	channelList := GetChannelList(db, "all")
 	ok := channelList.HasChannel(channelId)
 
 	if ok {
@@ -353,7 +367,7 @@ func DeleteChannel(w http.ResponseWriter, r *http.Request, db *sql.DB, config *i
 
 	fmt.Printf("%+v\n", channelId)
 
-	channelList := GetChannelList(db)
+	channelList := GetChannelList(db, "all")
 	ok := channelList.HasChannel(channelId)
 
 	if ok {

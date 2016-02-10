@@ -19,7 +19,6 @@ func MakeMuxer(prefix string, db *sql.DB, config *ini.Dict) http.Handler {
 		m = mux.NewRouter().PathPrefix(prefix).Subrouter()
 	}
 
-	m.HandleFunc("/", common.MakeHandler(Test, db, config)).Methods("GET")
 	m.HandleFunc("/{tag}/", common.MakeHandler(All, db, config)).Methods("GET")
 
 	tmpl["index.html"] = template.Must(template.ParseFiles("static/templates/watch/index.html", "static/templates/watch/base.html"))
