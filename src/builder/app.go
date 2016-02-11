@@ -47,8 +47,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// test...
-	builder.ImportJson("C:\\data\\www\\sandbox\\ExtBuilder\\tools\\project_0_sco.json", alphaDB)
+	builder.TestCreate("0", alphaDB)
 
 	// router
 	r := router
