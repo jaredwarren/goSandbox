@@ -47,16 +47,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	builder.TestCreate("0", alphaDB)
-
 	// router
 	r := router
 	//
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	//
 	http.Handle("/builder/", builder.MakeMuxer("/builder/", alphaDB, &config))
-	//http.Handle("/channels/", channel.MakeMuxer("/channels/", alphaDB, &config))
 	http.Handle("/", r)
 	fmt.Println("Running... :8081\n")
-	//http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":8081", nil)
 }

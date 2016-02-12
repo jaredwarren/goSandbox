@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,17 +23,18 @@ type JsonResponse struct {
 }
 
 type Node struct {
-	Id             string  `json: "id"`
-	ParentId       string  `json: "parentId"`
-	SortIndex      string  `json: "index"`
-	Text           string  `json: "text"`
-	Title          string  `json: "title"`
-	Mtype          string  `json: "mType"`
-	ShowTopicPages bool    `json: "showTopicPages"`
-	Leaf           bool    `json: "leaf"`
-	Children       []*Node `json:"page,omitempty"`
+	Id             string `json: "id"`
+	ParentId       string `json: "parentId"`
+	SortIndex      string `json: "index"`
+	Text           string `json: "text"`
+	Title          string `json: "title"`
+	Mtype          string `json: "mType"`
+	ShowTopicPages bool   `json: "showTopicPages"`
+	Leaf           bool   `json: "leaf"`
+	//Children       []*Node `json: "page,omitempty"`
 }
 
+/*
 func (this *Node) Size() int {
 	var size int = len(this.Children)
 	for _, c := range this.Children {
@@ -57,7 +59,7 @@ func (this *Node) Add(nodes ...*Node) bool {
 	return this.Size() == size+len(nodes)
 }
 
-/*func (m *Node) Scan(src interface{}) error {
+func (m *Node) Scan(src interface{}) error {
 	srcArray := src.([]uint8)
 	strValue := make([]byte, len(srcArray))
 	for i, v := range srcArray {
@@ -88,58 +90,80 @@ type NodeRow struct {
 var idRegexp = regexp.MustCompile("^(Topic|Page)Model-(\\d+)$")
 
 func CreateNodeRowFromJson(jsonMap map[string]interface{}) (NodeRow, error) {
-	nodwRow := NodeRow{}
+	// id
+	nodeRow := NodeRow{}
 	id := jsonMap["id"].(string)
+	// NOTE: id regexp is only necessary for ExtJs
 	if !idRegexp.MatchString(id) && id != "root" {
-		return nodwRow, errors.New(fmt.Sprintf("Invalid Id%s", id))
+		return nodeRow, errors.New(fmt.Sprintf("Invalid Id%s", id))
 	}
-	nodwRow.RecordId = id
+	nodeRow.RecordId = id
+
 	// title
 	var titleNS sql.NullString
 	if err := titleNS.Scan(jsonMap["title"]); err != nil {
-		return nodwRow, errors.New(fmt.Sprintf("Invalid Title%s", jsonMap["title"]))
+		return nodeRow, errors.New(fmt.Sprintf("Invalid Title%s", jsonMap["title"]))
 	}
-	nodwRow.Title = titleNS
+	nodeRow.Title = titleNS
+
 	// leaf
-	nodwRow.Leaf = jsonMap["leaf"].(bool)
+	if leaf, ok := jsonMap["leaf"]; ok {
+		nodeRow.Leaf = leaf.(bool)
+	} else {
+		// TODO: check db for other possible children, then set default
+		nodeRow.Leaf = true
+	}
+
 	// parentId
+	// TODO: check db for parent
 	var parentIdNS sql.NullString
-	if err := parentIdNS.Scan(jsonMap["parentId"]); err != nil {
+	parentId := "root"
+	// NOTE: id regexp is only necessary for ExtJs
+	if p, ok := jsonMap["parentId"]; ok && (idRegexp.MatchString(p.(string)) || p == "root") {
+		parentId = p.(string)
 	}
-	nodwRow.ParentId = parentIdNS
+	if err := parentIdNS.Scan(parentId); err != nil {
+		return nodeRow, errors.New(fmt.Sprintf("Failed to create parent%s", parentId))
+	}
+	nodeRow.ParentId = parentIdNS
+
 	// index
-	index := int(jsonMap["index"].(float64))
-	if index < 0 {
-		return nodwRow, errors.New(fmt.Sprintf("Invalid index:%s", index))
+	// TODO: check db for other possible sibblings, then set default index to last
+	index := 0
+	if i, ok := jsonMap["index"]; ok {
+		index = int(i.(float64))
 	}
+	if index < 0 {
+		return nodeRow, errors.New(fmt.Sprintf("Invalid index:%s", index))
+	}
+	nodeRow.SortIndex = index
+
 	// data
 	jsonString, _ := json.Marshal(jsonMap)
 	jsonString = bytes.Replace(jsonString, []byte("\\u003c"), []byte("<"), -1)
 	jsonString = bytes.Replace(jsonString, []byte("\\u003e"), []byte(">"), -1)
 	jsonString = bytes.Replace(jsonString, []byte("\\u0026"), []byte("&"), -1)
-	nodwRow.NodeData = string(jsonString)
-	return nodwRow, nil
+	nodeRow.NodeData = string(jsonString)
+	return nodeRow, nil
 }
 
-func Read(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+func ReadOptions(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
+}
+func Read(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
 	vars := mux.Vars(r)
 	treeType := vars["type"]
-	fmt.Println("Tree Type::", treeType)
 	if treeType != "sco" && treeType != "glossary" {
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(JsonResponse{"Invalid Input: 'type'"}); err != nil {
-			panic(err)
-		}
-		return
+		return 422, JsonResponse{"Invalid Input: 'type'"}
 	}
 
-	nodes := GetNodeData("1", "root", db)
-	fmt.Println("[" + strings.Join(nodes, ",") + "]")
+	nodeId := r.URL.Query().Get("node")
 
-	//
+	nodes := GetNodeData(vars["projectId"], nodeId, db)
+
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("[" + strings.Join(nodes, ",") + "]"))
+	return http.StatusOK, nil
 }
 
 func GetNodeData(projectId string, parentId string, db *sql.DB) []string {
@@ -162,44 +186,30 @@ func GetNodeData(projectId string, parentId string, db *sql.DB) []string {
 	return nodes
 }
 
-// TODO
-func TestCreate(projectId string, db *sql.DB) {
-	var newTestString = []byte(`{
-		"recordId": "PageModel-3",
-		"imgPos": "left",
-		"imageWidth": "40",
-		"autoPlayMedia": false,
-		"nType": null,
-		"title": "NEW TITLE...............",
-		"linkID": "PageModel-3",
-		"pText": {
-			"#text": " - New Page - Text Page"
-		},
-		"id": "PageModel-3"
-	}`)
+func CreateOrUpdate(nodeData []byte, projectId string, db *sql.DB) error {
 	newNode := map[string]interface{}{}
-	if err := json.Unmarshal(newTestString, &newNode); err != nil {
-		panic(err)
+	if err := json.Unmarshal(nodeData, &newNode); err != nil {
+		return err
 	}
 
 	// insert and update
 	if currentNode, err := getNodeById(newNode["id"].(string), projectId, db); err != nil {
 		// create
-		fmt.Println("Create")
 		nodeRow, _ := CreateNodeRowFromJson(newNode)
-		nodeRow.ProjectId = projectId;
-		TODO: call insert
+		nodeRow.ProjectId = projectId
+		InsertNode(nodeRow, db)
 	} else {
 		// update
 		oldNode := map[string]interface{}{}
 		if err := json.Unmarshal([]byte(currentNode.NodeData), &oldNode); err != nil {
-			panic(err)
+			return err
 		}
 		MergeNodes(oldNode, newNode)
 		nodeRow, _ := CreateNodeRowFromJson(oldNode)
-		nodeRow.ProjectId = projectId;
-		TODO: call Update
+		nodeRow.ProjectId = projectId
+		UpdateNode(nodeRow, db)
 	}
+	return nil
 }
 
 func MergeNodes(oldNode map[string]interface{}, newNode map[string]interface{}) {
@@ -208,22 +218,62 @@ func MergeNodes(oldNode map[string]interface{}, newNode map[string]interface{}) 
 	}
 }
 
-func Create(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
-
+func Create(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	/*var todo Todo
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	if err := json.Unmarshal(body, &todo); err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422) // unprocessable entity
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+	}*/
+	return http.StatusOK, JsonResponse{}
 }
 func InsertNode(node NodeRow, db *sql.DB) (sql.Result, error) {
 	return db.Exec("INSERT INTO ProjectData (recordId, title, projectId, leaf, parentId, sortIndex, data, updateTime, createTime) VALUES (?,?,?,?,?,?,?,NOW(),NOW())", node.RecordId, node.Title, node.ProjectId, node.Leaf, node.ParentId, node.SortIndex, node.NodeData)
 }
+func UpdateNode(node NodeRow, db *sql.DB) (sql.Result, error) {
+	return db.Exec("UPDATE ProjectData SET title = ?, leaf = ?, parentId = ?, sortIndex = ?, data = ?, updateTime = NOW() WHERE recordId = ? AND projectId = ?", node.Title, node.Leaf, node.ParentId, node.SortIndex, node.NodeData, node.RecordId, node.ProjectId)
+}
 
 // Delete
-func Destroy(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
+func Destroy(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
+}
 
+func OptionsUpdate(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	// not sure what this is supposed to do
+	return http.StatusOK, JsonResponse{}
 }
-func Update(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
+func Update(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	vars := mux.Vars(r)
+	fmt.Println(vars)
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	if err := CreateOrUpdate(body, vars["projectId"], db); err != nil {
+		panic(err)
+	}
+	return http.StatusOK, JsonResponse{}
+}
+func Save(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
+}
 
-}
-func Save(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
-}
+/*
+Export
+*/
 func ExportJson(projectId string, treeType string, db *sql.DB) {
 	if treeType != "sco" && treeType != "glossary" {
 		panic("invalid type")
@@ -249,6 +299,7 @@ func ExportJson(projectId string, treeType string, db *sql.DB) {
 	}
 }
 
+// TODO: create a way to cleanup un attached rows
 func addChildNodes(parentNode map[string]interface{}, projectId string, db *sql.DB) {
 	rows, err := db.Query("SELECT * FROM ProjectData WHERE projectId = ? AND parentId = ? ORDER BY sortIndex ASC", projectId, parentNode["id"])
 	if err != nil {
@@ -290,14 +341,16 @@ func getNodeById(recordId string, projectId string, db *sql.DB) (NodeRow, error)
 	return row, err
 }
 
-func SaveBackup(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
-
+func SaveBackup(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
 }
-func SaveSettings(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
-
+func SaveSettings(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
 }
 
-// Import
+/*
+Import
+*/
 func Import(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) {
 
 }

@@ -235,7 +235,7 @@ func GetChannelList(db *sql.DB, tagFilter string) ChannelList {
 		tagFilter = "youtube"
 	}
 
-	rows, err := db.Query("SELECT  channels.id as channelId, channels.url as channelUrl, GROUP_CONCAT(DISTINCT tag.id) as tagIds, GROUP_CONCAT(DISTINCT tag.name) as tagNames FROM channels LEFT JOIN channel_x_tag ON channels.id = channel_x_tag.channelId LEFT JOIN tag ON channel_x_tag.tagId = tag.id WHERE tag.name= ? GROUP BY channelId", tagFilter)
+	rows, err := db.Query("SELECT channels.id as channelId, channels.url as channelUrl, GROUP_CONCAT(DISTINCT tag.id) as tagIds, GROUP_CONCAT(DISTINCT tag.name) as tagNames FROM channels LEFT JOIN channel_x_tag ON channels.id = channel_x_tag.channelId LEFT JOIN tag ON channel_x_tag.tagId = tag.id WHERE tag.name= ? GROUP BY channelId", tagFilter)
 	if err != nil {
 		log.Fatal(err)
 	}
