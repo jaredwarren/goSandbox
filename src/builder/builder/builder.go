@@ -19,7 +19,12 @@ import (
 )
 
 type JsonResponse struct {
-	Message string
+	Message string `json: "message"`
+	Success bool   `json: "success"`
+}
+
+type NodeList struct {
+	Nodes map[string]interface{}
 }
 
 type Node struct {
@@ -31,47 +36,7 @@ type Node struct {
 	Mtype          string `json: "mType"`
 	ShowTopicPages bool   `json: "showTopicPages"`
 	Leaf           bool   `json: "leaf"`
-	//Children       []*Node `json: "page,omitempty"`
 }
-
-/*
-func (this *Node) Size() int {
-	var size int = len(this.Children)
-	for _, c := range this.Children {
-		size += c.Size()
-	}
-	return size
-}
-
-func (this *Node) Add(nodes ...*Node) bool {
-	var size = this.Size()
-	for _, n := range nodes {
-		if n.ParentId == this.Id {
-			this.Children = append(this.Children, n)
-		} else {
-			for _, c := range this.Children {
-				if c.Add(n) {
-					break
-				}
-			}
-		}
-	}
-	return this.Size() == size+len(nodes)
-}
-
-func (m *Node) Scan(src interface{}) error {
-	srcArray := src.([]uint8)
-	strValue := make([]byte, len(srcArray))
-	for i, v := range srcArray {
-		if v < 0 {
-			strValue[i] = byte(256 + int(v))
-		} else {
-			strValue[i] = byte(v)
-		}
-	}
-
-	return json.Unmarshal([]byte(strValue), m)
-}*/
 
 type NodeRow struct {
 	Id         string         `db:"id"`
@@ -84,7 +49,6 @@ type NodeRow struct {
 	NodeData   string         `db:"data"`
 	UpdateTime string         `db:"updateTime"`
 	CreateTime string         `db:"createTime"`
-	//NodeData   Node           `db:"data"`
 }
 
 var idRegexp = regexp.MustCompile("^(Topic|Page)Model-(\\d+)$")
@@ -154,7 +118,7 @@ func Read(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) 
 	vars := mux.Vars(r)
 	treeType := vars["type"]
 	if treeType != "sco" && treeType != "glossary" {
-		return 422, JsonResponse{"Invalid Input: 'type'"}
+		return 422, JsonResponse{"Invalid Input: 'type'", false}
 	}
 
 	nodeId := r.URL.Query().Get("node")
@@ -186,29 +150,39 @@ func GetNodeData(projectId string, parentId string, db *sql.DB) []string {
 	return nodes
 }
 
+var regJsonArray = regexp.MustCompile(`^\[(.|\n|\r)+\]$`)
+
 func CreateOrUpdate(nodeData []byte, projectId string, db *sql.DB) error {
-	newNode := map[string]interface{}{}
-	if err := json.Unmarshal(nodeData, &newNode); err != nil {
+	// force Json to array
+	if !regJsonArray.MatchString(string(nodeData)) {
+		nodeData = append([]byte(`[`), nodeData...)
+		e := []byte(`]`)
+		nodeData = append(nodeData, e...)
+	}
+	nodes := make([]map[string]interface{}, 0)
+	if err := json.Unmarshal(nodeData, &nodes); err != nil {
 		return err
 	}
 
-	// insert and update
-	if currentNode, err := getNodeById(newNode["id"].(string), projectId, db); err != nil {
-		// create
-		nodeRow, _ := CreateNodeRowFromJson(newNode)
-		nodeRow.ProjectId = projectId
-		InsertNode(nodeRow, db)
-	} else {
-		// update
-		oldNode := map[string]interface{}{}
-		if err := json.Unmarshal([]byte(currentNode.NodeData), &oldNode); err != nil {
-			return err
+	for _, node := range nodes {
+		if currentNode, err := getNodeById(node["id"].(string), projectId, db); err != nil {
+			// create
+			nodeRow, _ := CreateNodeRowFromJson(node)
+			nodeRow.ProjectId = projectId
+			InsertNode(nodeRow, db)
+		} else {
+			// update
+			oldNode := map[string]interface{}{}
+			if err := json.Unmarshal([]byte(currentNode.NodeData), &oldNode); err != nil {
+				return err
+			}
+			MergeNodes(oldNode, node)
+			nodeRow, _ := CreateNodeRowFromJson(oldNode)
+			nodeRow.ProjectId = projectId
+			UpdateNode(nodeRow, db)
 		}
-		MergeNodes(oldNode, newNode)
-		nodeRow, _ := CreateNodeRowFromJson(oldNode)
-		nodeRow.ProjectId = projectId
-		UpdateNode(nodeRow, db)
 	}
+
 	return nil
 }
 
@@ -218,43 +192,11 @@ func MergeNodes(oldNode map[string]interface{}, newNode map[string]interface{}) 
 	}
 }
 
+func CreateOptions(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
+}
 func Create(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
-	/*var todo Todo
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-	if err := json.Unmarshal(body, &todo); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}*/
-	return http.StatusOK, JsonResponse{}
-}
-func InsertNode(node NodeRow, db *sql.DB) (sql.Result, error) {
-	return db.Exec("INSERT INTO ProjectData (recordId, title, projectId, leaf, parentId, sortIndex, data, updateTime, createTime) VALUES (?,?,?,?,?,?,?,NOW(),NOW())", node.RecordId, node.Title, node.ProjectId, node.Leaf, node.ParentId, node.SortIndex, node.NodeData)
-}
-func UpdateNode(node NodeRow, db *sql.DB) (sql.Result, error) {
-	return db.Exec("UPDATE ProjectData SET title = ?, leaf = ?, parentId = ?, sortIndex = ?, data = ?, updateTime = NOW() WHERE recordId = ? AND projectId = ?", node.Title, node.Leaf, node.ParentId, node.SortIndex, node.NodeData, node.RecordId, node.ProjectId)
-}
-
-// Delete
-func Destroy(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
-	return http.StatusOK, JsonResponse{}
-}
-
-func OptionsUpdate(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
-	// not sure what this is supposed to do
-	return http.StatusOK, JsonResponse{}
-}
-func Update(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
 	vars := mux.Vars(r)
-	fmt.Println(vars)
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -265,10 +207,76 @@ func Update(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict
 	if err := CreateOrUpdate(body, vars["projectId"], db); err != nil {
 		panic(err)
 	}
+	return http.StatusOK, JsonResponse{"Updated", true}
+}
+func InsertNode(node NodeRow, db *sql.DB) (sql.Result, error) {
+	return db.Exec("INSERT INTO ProjectData (recordId, title, projectId, leaf, parentId, sortIndex, data, updateTime, createTime) VALUES (?,?,?,?,?,?,?,NOW(),NOW())", node.RecordId, node.Title, node.ProjectId, node.Leaf, node.ParentId, node.SortIndex, node.NodeData)
+}
+func UpdateNode(node NodeRow, db *sql.DB) (sql.Result, error) {
+	return db.Exec("UPDATE ProjectData SET title = ?, leaf = ?, parentId = ?, sortIndex = ?, data = ?, updateTime = NOW() WHERE recordId = ? AND projectId = ?", node.Title, node.Leaf, node.ParentId, node.SortIndex, node.NodeData, node.RecordId, node.ProjectId)
+}
+
+// Delete
+func DestroyOptions(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	return http.StatusOK, JsonResponse{}
+}
+func Destroy(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	vars := mux.Vars(r)
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	// force Json to array
+	if !regJsonArray.MatchString(string(body)) {
+		body = append([]byte(`[`), body...)
+		e := []byte(`]`)
+		body = append(body, e...)
+	}
+	nodes := make([]map[string]interface{}, 0)
+	if err := json.Unmarshal(body, &nodes); err != nil {
+		return http.StatusBadRequest, JsonResponse{err.Error(), false}
+	}
+
+	for _, node := range nodes {
+		if _, err := db.Exec("DELETE FROM ProjectData WHERE recordId = ? AND projectId = ? LIMIT 1", node["id"], vars["projectId"]); err != nil {
+			panic(err)
+		}
+	}
+
+	return http.StatusOK, JsonResponse{"Updated", true}
+}
+
+func OptionsUpdate(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	// not sure what this is supposed to do
+	return http.StatusOK, JsonResponse{}
+}
+func Update(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
+	vars := mux.Vars(r)
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	if err := CreateOrUpdate(body, vars["projectId"], db); err != nil {
+		panic(err)
+	}
+	return http.StatusOK, JsonResponse{"Updated", true}
+}
+func SaveOptions(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
 	return http.StatusOK, JsonResponse{}
 }
 func Save(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
-	return http.StatusOK, JsonResponse{}
+	vars := mux.Vars(r)
+
+	ExportJson(vars["projectId"], "sco", db)
+	//ExportJson(vars["projectId"], "glossary", db)
+
+	return http.StatusOK, JsonResponse{"OK", true}
 }
 
 /*
@@ -294,7 +302,7 @@ func ExportJson(projectId string, treeType string, db *sql.DB) {
 	json = bytes.Replace(json, []byte("\\u003c"), []byte("<"), -1)
 	json = bytes.Replace(json, []byte("\\u003e"), []byte(">"), -1)
 	json = bytes.Replace(json, []byte("\\u0026"), []byte("&"), -1)
-	if err := ioutil.WriteFile(fmt.Sprintf("C:\\data\\www\\sandbox\\ExtBuilder\\tools\\project_%s_%s.json", projectId, "sco___"), json, 0644); err != nil {
+	if err := ioutil.WriteFile(fmt.Sprintf("C:\\data\\www\\sandbox\\ExtBuilder\\tools\\project_%s_%s.json", projectId, treeType), json, 0644); err != nil {
 		panic(err)
 	}
 }
@@ -345,7 +353,19 @@ func SaveBackup(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.
 	return http.StatusOK, JsonResponse{}
 }
 func SaveSettings(w http.ResponseWriter, r *http.Request, db *sql.DB, config *ini.Dict) (int, interface{}) {
-	return http.StatusOK, JsonResponse{}
+	vars := mux.Vars(r)
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	if err := ioutil.WriteFile(fmt.Sprintf("C:\\data\\www\\sandbox\\ExtBuilder\\tools\\project_%s_settings.json", vars["projectId"]), body, 0644); err != nil {
+		panic(err)
+	}
+	return http.StatusOK, JsonResponse{"OK", true}
 }
 
 /*
