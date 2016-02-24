@@ -4,6 +4,46 @@
 		"selected_items":
 		[
 			[
+				"Doc",
+				"DocToJson	string, error ƒ"
+			],
+			[
+				"ss",
+				"sshConfig	*ssh.ClientConfig ν"
+			],
+			[
+				"exe",
+				"execSSH	out []byte, err error ƒ"
+			],
+			[
+				"Ma",
+				"MatchString	bool ƒ"
+			],
+			[
+				"ex",
+				"execSencha	 ƒ"
+			],
+			[
+				"status",
+				"StatusBadRequest	 Ɩ"
+			],
+			[
+				"P",
+				"Println	n int, err error ƒ"
+			],
+			[
+				"ma",
+				"MatchString	bool ƒ"
+			],
+			[
+				"reg",
+				"regJsonArray	*regexp.Regexp ν"
+			],
+			[
+				"pr",
+				"Printf	n int, err error ƒ"
+			],
+			[
 				"res",
 				"responseCode	int ν"
 			],
@@ -16,10 +56,6 @@
 				"responseCode	int ν"
 			],
 			[
-				"status",
-				"StatusOK	 Ɩ"
-			],
-			[
 				"upd",
 				"CreateOrUpdate	error ƒ"
 			],
@@ -30,10 +66,6 @@
 			[
 				"S",
 				"String	string ν"
-			],
-			[
-				"pr",
-				"Println	n int, err error ƒ"
 			],
 			[
 				"up",
@@ -296,10 +328,6 @@
 				"HandleFunc	*mux.Route ƒ"
 			],
 			[
-				"P",
-				"PathPrefix	*mux.Route ƒ"
-			],
-			[
 				"fu",
 				"func (*Complex)	func (...) {...} ʂ"
 			],
@@ -480,74 +508,47 @@
 				"arrow_left"
 			],
 			[
-				"ex",
-				"expandListBtn"
-			],
-			[
 				"arrow",
 				"arrow_right"
 			],
 			[
 				"step",
 				"stepIndex"
-			],
-			[
-				"game",
-				"gameState"
-			],
-			[
-				"icon",
-				"iconType"
-			],
-			[
-				"term",
-				"termRecord"
-			],
-			[
-				"txt",
-				"text"
-			],
-			[
-				"type",
-				"typeof"
-			],
-			[
-				"timer",
-				"timer"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/builder/builder/builder.go",
+			"file": "src/sandbox/updateStyleFiles.go",
 			"settings":
 			{
-				"buffer_size": 14450,
+				"buffer_size": 6086,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/builder/builder/muxer.go",
+			"file": "src/xmlgen/xmlgen.go",
 			"settings":
 			{
-				"buffer_size": 2373,
+				"buffer_size": 8753,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/acquire/common/common.go",
+			"file": "src/xmlgen/app.go",
 			"settings":
 			{
-				"buffer_size": 1916,
-				"line_ending": "Windows"
+				"buffer_size": 775,
+				"line_ending": "Windows",
+				"name": "package main"
 			}
 		},
 		{
-			"file": "/C/data/www/sandbox/ExtBuilder/tools/project_0_sco___.json",
+			"contents": "{\n	\"sco\": {\n		\"activateInactiveTimer\": \"true\",\n		\"activateTimer\": \"true\",\n		\"audioButton\": \"true\",\n		\"courseLogo\": \"\",\n		\"exitButton\": \"true\",\n		\"glossary\": \"true\",\n		\"hideFluencyTime\": \"false\",\n		\"inactiveResponse\": \"stopRecord\",\n		\"include_question_cnt\": \"false\",\n		\"indexTooltip\": \"true\",\n		\"narration\": \"true\",\n		\"pageNumbering\": \"true\",\n		\"pdfTime\": \"5\",\n		\"persIndex\": \"false\",\n		\"quizTimerSeconds\": \"20\",\n		\"reportError\": \"false\",\n		\"saturationPercent\": \"50\",\n		\"showHelpOnStart\": \"true\",\n		\"styleName\": \"AS3 Omni Template (Player 10, 1024x768)\",\n		\"timerIntMinutes\": \"5\",\n		\"timerSeconds\": \"2\",\n		\"title\": \"as3\",\n		\"topics\": {\n			\"isthisused\": \"true\",\n			\"page\": {\n				\"file\": \"swfs/templateswfs/rapidintake_textimage/ri_textimage_pg.swf\",\n				\"fpsec\": \"12\",\n				\"imageFile\": \"http://unison/access/Media/-Imgur.jpg\",\n				\"imageWidth\": \"40\",\n				\"imgPos\": \"left\",\n				\"isTocEntry\": \"true\",\n				\"loadPercentage\": \"0\",\n				\"nType\": \"none\",\n				\"nonNavPage\": \"false\",\n				\"pText\": \"\\u003cP ALIGN=\\\"LEFT\\\"\\u003easdf\\u003c/P\\u003e\",\n				\"pType\": \"Text and Image\",\n				\"title\": \"[New Page Text and Image]\"\n			},\n			\"topic\": [{\n				\"nav\": \"unrestricted\",\n				\"objectiveId\": \"none\",\n				\"showTopicPages\": \"true\",\n				\"title\": \"[New Topic]\"\n			}, {\n				\"nav\": \"unrestricted\",\n				\"objectiveId\": \"none\",\n				\"showTopicPages\": \"true\",\n				\"title\": \"[New Topic]\"\n			}]\n		},\n		\"tracking\": \"none\",\n		\"tranDirection\": \"right\",\n		\"transition\": \"none\",\n		\"transitionTime\": \"1\"\n	}\n}",
 			"settings":
 			{
-				"buffer_size": 90676,
+				"buffer_size": 1471,
 				"line_ending": "Windows"
 			}
 		},
@@ -560,19 +561,12 @@
 			}
 		},
 		{
-			"file": "/C/data/www/sandbox/ExtBuilder/tools/project_0_sco.json",
+			"file": "src/builder/doctomap.go",
 			"settings":
 			{
-				"buffer_size": 108872,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/builder/common/common.go",
-			"settings":
-			{
-				"buffer_size": 1904,
-				"line_ending": "Windows"
+				"buffer_size": 14469,
+				"line_ending": "Windows",
+				"name": "package main"
 			}
 		},
 		{
@@ -582,42 +576,42 @@
 				"buffer_size": 10317,
 				"line_ending": "Windows"
 			}
-		},
-		{
-			"file": "Learn.md",
-			"settings":
-			{
-				"buffer_size": 445,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/youtube/channel/muxer.go",
-			"settings":
-			{
-				"buffer_size": 1308,
-				"line_ending": "Windows"
-			}
 		}
 	],
-	"build_system": "",
+	"build_system": "Packages/GoSublime/GoSublime.sublime-build",
 	"build_system_choices":
 	[
+		[
+			[
+				[
+					"Packages/GoSublime/GoSublime.sublime-build",
+					""
+				],
+				[
+					"Packages/User/chrome.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/GoSublime/GoSublime.sublime-build",
+				""
+			]
+		]
 	],
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "html",
+		"height": 58.0,
+		"last_filter": "json",
 		"selected_items":
 		[
 			[
-				"html",
-				"Set Syntax: HTML"
-			],
-			[
 				"json",
 				"Set Syntax: JSON"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
 			],
 			[
 				"jav",
@@ -710,21 +704,71 @@
 		"/C/data/www/go/src/acquire/common",
 		"/C/data/www/go/src/acquire/game",
 		"/C/data/www/go/src/acquire/user",
-		"/C/data/www/go/src/builder",
 		"/C/data/www/go/src/builder/builder",
 		"/C/data/www/go/src/builder/common",
 		"/C/data/www/go/src/builder/ini",
 		"/C/data/www/go/src/golang.org",
-		"/C/data/www/go/src/himawari",
-		"/C/data/www/go/src/himawari/background",
-		"/C/data/www/go/src/himawari/download",
+		"/C/data/www/go/src/gopkg.in/sourcegraph",
+		"/C/data/www/go/src/gopkg.in/src-d",
+		"/C/data/www/go/src/gopkg.in/src-d/go-git.v2",
 		"/C/data/www/go/src/litmosauthor.com",
 		"/C/data/www/go/src/litmosauthor.com/unison",
-		"/C/data/www/go/src/litmosauthor.com/unison/user",
-		"/C/data/www/go/src/youtube/channel"
+		"/C/data/www/go/src/litmosauthor.com/unison/hello",
+		"/C/data/www/go/src/litmosauthor.com/unison/project",
+		"/C/data/www/go/src/xmlgen",
+		"/C/data/www/go/src/youtube/channel",
+		"/C/data/www/go/src/youtube/watch"
 	],
 	"file_history":
 	[
+		"/C/data/www/go/src/go-charset/charset/charset.go",
+		"/C/data/www/go/src/go-charset/charset/charset_test.go",
+		"/C/data/www/go/src/go-charset/charset/example_test.go",
+		"/C/data/www/go/src/go-charset/charset/iconv/iconv.go",
+		"/C/data/www/go/src/go-charset/charset/iconv/iconv_test.go",
+		"/C/data/www/go/src/go-charset/cmd/tcs/tcs.go",
+		"/C/data/www/go/src/go-charset/data/data_big5.dat.go",
+		"/C/data/www/go/src/go-charset/data/data_charsets.json.go",
+		"/C/data/www/go/src/go-charset/data/data_cp932.dat.go",
+		"/C/data/www/go/src/go-charset/data/data_ibm437.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_ibm850.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_ibm866.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-1.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-10.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-15.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-2.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-3.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-4.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-5.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-6.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-7.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-8.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_iso-8859-9.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_jisx0201kana.dat.go",
+		"/C/data/www/go/src/go-charset/data/data_koi8-r.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_windows-1250.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_windows-1251.cp.go",
+		"/C/data/www/go/src/go-charset/data/data_windows-1252.cp.go",
+		"/C/data/www/go/src/go-charset/data/doc.go",
+		"/C/data/www/go/src/go-charset/data/generate.go",
+		"/C/Users/jaredwarren/.bash_history",
+		"/C/Users/jaredwarren/.bash_profile",
+		"/C/data/www/sandbox/ExtPlayer/lang/en-GB___.js",
+		"/C/data/www/go/src/builder/updateBuilder.go",
+		"/C/data/www/go/src/builder/builder/builder.go",
+		"/C/Users/jaredwarren/.bashrc",
+		"/C/data/www/go/src/builder/builder/muxer.go",
+		"/C/data/www/sandbox/ExtBuilder/tools/project_0_sco___.json",
+		"/C/data/projects/2003528/quiz.xml",
+		"/C/data/www/go/src/sandbox/git.go",
+		"/C/Users/jaredwarren/AppData/Local/Temp/7zO062820CA/index.html",
+		"/C/Users/jaredwarren/AppData/Local/Temp/7zO062B179A/imsmanifest.xml",
+		"/C/data/www/sandbox/ExtBuilder/tools/project_0_sco.json",
+		"/C/data/www/go/src/youtube/watch/watch.go",
+		"/C/data/www/go/src/builder/common/common.go",
+		"/C/data/www/go/Learn.md",
+		"/C/data/www/go/src/youtube/channel/muxer.go",
+		"/C/Users/jaredwarren/Downloads/videos (3)",
 		"/C/data/www/go/src/acquire/common/common.go",
 		"/C/data/www/go/src/litmosauthor.com/unison/app.go",
 		"/C/data/www/go/src/acquire/ini/config.ini",
@@ -732,7 +776,6 @@
 		"/C/data/www/go/src/builder/api/api.go",
 		"/C/data/www/go/src/builder/ini/config.ini",
 		"/C/Users/jaredwarren/Desktop/hosts",
-		"/C/data/www/go/Learn.md",
 		"/C/data/www/go/src/youtube/app.go",
 		"/C/data/www/go/src/youtube/ini/config.ini",
 		"/C/data/www/go/src/acquire/user/user.go",
@@ -742,16 +785,13 @@
 		"/C/data/www/go/src/acquire/conn/socketRouter.go",
 		"/C/data/www/go/src/acquire/app.go",
 		"/C/data/www/go/src/youtube/watch/muxer.go",
-		"/C/data/www/go/src/youtube/watch/watch.go",
 		"/C/data/www/go/src/himawari/download/download.go",
 		"/C/data/www/go/src/youtube/tag/tag.go",
 		"/C/data/www/go/src/youtube/tag/muxer.go",
-		"/C/data/www/go/src/youtube/channel/muxer.go",
 		"/C/data/www/go/src/youtube/static/templates/channel/list.html",
 		"/C/data/www/go/src/youtube/static/templates/channel/base.html",
 		"/C/data/www/go/src/himawari/main.go",
 		"/C/data/www/go/src/himawari/README.md",
-		"/C/Users/jaredwarren/.bashrc",
 		"/C/Users/jaredwarren/Downloads/ueventd.rc",
 		"/C/data/www/go/src/youtube/static/templates/channel/index.html",
 		"/C/data/www/go/src/youtube/static/templates/watch/index.html",
@@ -808,51 +848,7 @@
 		"/C/data/www/go/src/mosaic/imageutil/tools.go",
 		"/C/data/www/go/src/mosaic/imageutil/transform.go",
 		"/C/data/www/go/src/mosaic/imageutil/utils.go",
-		"/C/Users/jaredwarren/AppData/Local/Temp/7zOCA7DDED5/sco.xml",
-		"/C/data/www/go/sco.xml",
-		"/C/Users/jaredwarren/AppData/Local/Temp/7zO4432063D/BLENDSWAP_LICENSE.txt",
-		"/C/Users/jaredwarren/Downloads/Arches_E_PineTree/3DTotal_free_sample_1/3DTotal_free_sample_1.ibl",
-		"/C/data/www/go/src/xmlgen/xmlgen.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/hello/fuzzy.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/hello/search.go",
-		"/C/data/www/go/src/mosaic/imageutil/imageutil.go",
-		"/C/data/www/go/src/mosaic/imageutil/adjust.go.txt",
-		"/C/data/www/go/src/mosaic/ini/config.go",
-		"/C/data/www/go/src/mosaic/static/templates/index.html",
-		"/C/data/www/go/src/mosaic/static/templates/base.html",
-		"/C/data/www/go/src/mosaic/static/templates/uploadImage.html",
-		"/C/data/www/go/src/mosaic/static/upload.html",
-		"/C/data/www/go/src/acquire/ini/config.go",
-		"/C/data/www/go/src/acquire/static/templates/base.html",
-		"/C/data/www/go/src/mosaic/static/templates/base.thml.volt",
-		"/C/data/www/go/src/acquire/static/templates/user/index.html",
-		"/C/data/www/go/src/acquire/static/templates/game/base.html",
-		"/C/data/www/go/src/acquire/static/templates/game/newgame.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/content.html",
-		"/C/data/www/go/src/acquire/static/templates/user/base.html",
-		"/C/data/www/go/src/acquire/game/project.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/base.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/dashboard/index.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/user/stockRoute.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/user/socketRouter.go",
-		"/C/data/www/go/src/acquire/static/bower_components/paper-button/paper-button.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/user-login.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/login-app.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/index.html",
-		"/C/data/www/go/src/github.com/prep/ovr/ovr.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/404.html",
-		"/C/data/www/go/src/github.com/prep/ovr/ovr_windows.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/ini/config.go",
-		"/C/data/www/go/src/sandbox/snake/conn.go",
-		"/C/data/www/go/src/github.com/go-sql-driver/mysql/infile.go",
-		"/C/data/www/go/src/github.com/lxn/walk/inifilesettings.go",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/dashboard/content.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/theme.css",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/base.html",
-		"/C/data/www/go/src/github.com/lxn/walk/examples/logview/logview.go",
-		"/C/data/www/go/src/github.com/go-sql-driver/mysql/LICENSE",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/templates/user/content.html",
-		"/C/data/www/go/src/litmosauthor.com/unison/static/components/core-scaffold/core-scaffold.html"
+		"/C/Users/jaredwarren/AppData/Local/Temp/7zOCA7DDED5/sco.xml"
 	],
 	"find":
 	{
@@ -863,6 +859,9 @@
 		"height": 90.0,
 		"where_history":
 		[
+			"C:\\data\\www\\go\\src\\go-charset,*.go",
+			"C:\\data\\www\\go\\src\\,*.go",
+			"C:\\data\\www\\go\\src\\acquire,*.go",
 			"C:\\data\\www\\go\\src\\acquire,*.go,*.html",
 			"C:\\data\\www\\go,*.go,*.html",
 			"C:\\data\\www\\go,*.go",
@@ -895,9 +894,45 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"treeToMap",
+			"-",
+			"DocToMap",
+			"code.google.com/p/",
+			"xml",
+			"execSSH",
+			"execCmd",
+			"senchaError",
+			"copyFile",
+			"CopyFile",
+			"[]",
+			"\\",
+			":",
+			"Exec",
+			"RecordId",
+			"recordId",
+			"MakeJsonHandler",
+			"projectId",
+			"ProjectId",
+			"projectId",
+			"fmt.Print",
+			"{projectId}",
+			"treeType",
+			"newNode",
+			"NodeList",
+			"Unmarshal",
+			"CreateOrUpdate",
+			"JsonResponse",
+			"CreateOrUpdate",
+			"time",
+			"\\\"",
+			"\\u0026amp;",
+			"\\/",
+			"\\u003e",
+			"\\u003c",
+			"\\n",
 			"w.",
 			"Write",
 			"w.Header().Se",
@@ -989,43 +1024,7 @@
 			"TimeMatch",
 			": =",
 			"strtotime",
-			"channelList",
-			"Channels",
-			"Video",
-			"getAsyncChannelVideos",
-			"GetChannelList",
-			"ChannelList",
-			"getAsyncChannelVideos",
-			"channels",
-			"getAsyncChannelVideos",
-			"attachChannelVideos",
-			"totalVideos",
-			"GetChannelList",
-			"[]Channel",
-			"GetChannelList",
-			"channelUrl",
-			"attachChannelVideos",
-			"getAsyncChannelVideos",
-			"getChannelVideos",
-			"getAsyncChannelVideos",
-			"channelMaps",
-			"getAsyncChannelVideos",
-			"ascd.litmosauth",
-			"ascd",
-			"`",
-			"channelMaps",
-			"getChannelList",
-			"ProductsHandler",
-			"Re.",
-			"channelList",
-			"allchannels",
-			"channels",
-			"strtotime",
-			"';",
-			"$html .= '",
-			"urls",
-			"getChannelVideos",
-			"responses"
+			"channelList"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1033,6 +1032,16 @@
 		"regex": false,
 		"replace_history":
 		[
+			"",
+			"\\\\",
+			"\n",
+			"{projectId:[0-9]+}",
+			"\"",
+			"&",
+			"/",
+			">",
+			"<",
+			"\n",
 			"interface{}",
 			"",
 			"nodeRow",
@@ -1150,17 +1159,7 @@
 			"query('#$1')[0]",
 			"query('#$1')",
 			"container",
-			".query('#$1')[0]",
-			".query('#$1')",
-			"div",
-			".pause",
-			"Data",
-			"pageData",
-			"'container'",
-			"175",
-			"150",
-			"$background-color",
-			"ceil("
+			".query('#$1')[0]"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -1171,24 +1170,24 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/builder/builder/builder.go",
+					"file": "src/sandbox/updateStyleFiles.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14450,
+						"buffer_size": 6086,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7637,
-								7637
+								3184,
+								3184
 							]
 						],
 						"settings":
@@ -1197,27 +1196,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2889.0,
+						"translation.y": 1137.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/builder/builder/muxer.go",
+					"file": "src/xmlgen/xmlgen.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2373,
+						"buffer_size": 8753,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2004,
-								2004
+								7996,
+								7996
 							]
 						],
 						"settings":
@@ -1226,33 +1225,35 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": -0.0,
-						"translation.y": 117.0,
+						"translation.y": 4563.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/acquire/common/common.go",
-					"semi_transient": true,
+					"file": "src/xmlgen/app.go",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1916,
+						"buffer_size": 775,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								627,
-								368
+								413,
+								413
 							]
 						],
 						"settings":
 						{
+							"auto_name": "package main",
 							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1263,19 +1264,18 @@
 				},
 				{
 					"buffer": 3,
-					"file": "/C/data/www/sandbox/ExtBuilder/tools/project_0_sco___.json",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 90676,
+						"buffer_size": 1471,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								189,
-								189
+								971,
+								971
 							]
 						],
 						"settings":
@@ -1287,13 +1287,13 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
 		},
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -1309,44 +1309,14 @@
 						"selection":
 						[
 							[
-								933,
-								933
+								628,
+								628
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
 							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 156.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/C/data/www/sandbox/ExtBuilder/tools/project_0_sco.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 108872,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								776,
-								776
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1356,36 +1326,37 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "src/builder/common/common.go",
+					"buffer": 5,
+					"file": "src/builder/doctomap.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1904,
+						"buffer_size": 14469,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								34,
-								34
+								1652,
+								1652
 							]
 						],
 						"settings":
 						{
+							"auto_name": "package main",
 							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 351.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 6,
 					"file": "src/youtube/channel/channel.go",
 					"semi_transient": false,
 					"settings":
@@ -1397,8 +1368,8 @@
 						"selection":
 						[
 							[
-								5866,
-								5866
+								4371,
+								4371
 							]
 						],
 						"settings":
@@ -1407,67 +1378,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2730.0,
+						"translation.y": 1794.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "Learn.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 445,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2,
-								10
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/youtube/channel/muxer.go",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1308,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								352,
-								352
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -1511,6 +1425,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.9o://C:\\data\\www\\go\\src\\builder":
+	{
+		"height": 88.0
+	},
 	"output.9o://C:\\data\\www\\go\\src\\litmosauthor.com\\unison":
 	{
 		"height": 88.0
@@ -2077,7 +1995,7 @@
 		],
 		"width": 488.0
 	},
-	"selected_group": 0,
+	"selected_group": 1,
 	"settings":
 	{
 		"xdebug":

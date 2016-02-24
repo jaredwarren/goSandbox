@@ -25,8 +25,8 @@ import (
 	"go/format"
 	"io"
 
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
+	"go-charset/charset"
+	_ "go-charset/data"
 
 	"log"
 	"os"
